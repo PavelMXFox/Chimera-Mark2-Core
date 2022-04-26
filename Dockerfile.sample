@@ -1,0 +1,36 @@
+FROM mxfox.ru/chimera/fox-web-basic:latest AS prepare
+
+RUN apt-get update \
+    && apt-get install curl -y \
+    && cd /tmp \
+    && curl -sS https://getcomposer.org/installer -o composer-setup.php \
+    && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
+    && DEBIAN_FRONTEND=noninteractive TZ=Europe/Moscow apt-get -y install tzdata \
+    && cd /var/www/html 
+
+COPY . /var/www/html
+
+RUN composer install
+
+RUN find . -name "*~"  		-prune -exec rm -rf '{}' \; \
+ && find . -name "*.bak" 	-prune -exec rm -rf '{}' \; \
+ && find . -name "*.old" 	-prune -exec rm -rf '{}' \; \
+ && find . -name ".git" 	-prune -exec rm -rf '{}' \; \
+ && find . -name ".settings"	-prune -exec rm -rf '{}' \; \
+ && find . -name ".buildpath" 	-prune -exec rm -rf '{}' \; \
+ && find . -name ".project" 	-prune -exec rm -rf '{}' \; \
+ && find . -name "README.*" 	-prune -exec rm -rf '{}' \; \
+ && find . -name "*.md" 	-prune -exec rm -rf '{}' \; \
+ && find . -name "composer.*" 	-prune -exec rm -rf '{}' \; \
+ && find . -name ".travis*" 	-prune -exec rm -rf '{}' \; \
+ && find . -name "installed.json" -prune -exec rm -rf '{}' \;
+
+RUN find . -type d ! -path './.git/**' ! -path './static/**' ! -path "./static" ! -path ./*/modules/*/static*  -exec bash -c 'test -f {}/.htaccess && echo -n "[ SKIP ] " || (cp ./docker-build/.htaccess {} && echo -n "[  ADD ] ") && echo {}/.htaccess' \;
+
+RUN rm -f composer.* \
+    && rm -rf docker-build
+
+
+FROM mxfox.ru/chimera/fox-web-basic:latest as build
+COPY --from=prepare /var/www/html /var/www/html
+COPY docker-build/rootfs /

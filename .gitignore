@@ -1,0 +1,7 @@
+/modules/*
+!/modules/README.md
+/storage/*
+!/storage/README.md
+/temp-test
+/composer.lock
+/vendor

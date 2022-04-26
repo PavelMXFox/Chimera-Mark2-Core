@@ -1,0 +1,6 @@
+RewriteEngine On
+
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule . - [S=1]
+
+RewriteRule "^images/(ui-.*)" "/static/theme/core/img/$1" [L]

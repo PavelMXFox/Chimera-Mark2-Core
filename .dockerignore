@@ -1,0 +1,13 @@
+/.git
+/.settings
+README.*
+LICENSE
+CHANGELOG.*
+/docs
+*.md
+/.buildpath
+/.project
+/.gitignore
+/.dockerignore
+/temp-test
+/build.sh

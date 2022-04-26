@@ -1,0 +1,41 @@
+<IfModule mod_setenvif.c>
+    SetEnv TZ Europe/Moscow
+</IfModule>
+ServerSignature Off
+AddDefaultCharset UTF-8
+Options -Indexes
+DirectoryIndex index.php
+
+# Bad Rquest
+#ErrorDocument 400 /400.html
+# Authorization Required
+#ErrorDocument 401 /401.html
+# Forbidden
+ErrorDocument 403 /error.php?code=403
+# Not found
+ErrorDocument 404 /error.php?code=404
+# Method Not Allowed
+ErrorDocument 405 /error.php?code=405
+# Request Timed Out
+#ErrorDocument 408 /408.html
+# Request URI Too Long
+#ErrorDocument 414 /414.html
+# Internal Server Error
+ErrorDocument 500 /error.php?code=500
+# Not Implemented
+ErrorDocument 501 /error.php?code=501
+# Bad Gateway 
+#ErrorDocument 502 /502.html
+# Service Unavailable 
+#ErrorDocument 503 /503.html
+# Gateway Timeout
+#ErrorDocument 504 /504.html
+
+IndexIgnore *
+
+## Mod_rewrite in use.
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule . /index.php [L]
+

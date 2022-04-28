@@ -37,6 +37,8 @@ class modules implements externalCallable
                 "adminModulesInstall"=>"Install modules",
                 "adminUsers"=>"Manage users",
                 "adminUserGroups"=>"Manage userGroups",
+                "adminMailAccounts"=>"Manage system mail accounts",
+                "adminAuthMethods"=>"Manage auth methods",
             ],
             "configKeys"=> [
                 "converterURL"=>"FoxConverter URL prefix",
@@ -73,10 +75,26 @@ class modules implements externalCallable
                                 "ru" => "Группы",
                                 "en" => "Groups"
                             ],
-                            "titleLangIdx" => "adminGroups",
                             "function" => "groups",
                             "pageKey" => "adminGrous"
-                        ]
+                        ],
+                        [
+                            "title" => [
+                                "ru" => "Учетные записи почты",
+                                "en" => "Mail accounts"
+                            ],
+                            "function" => "mailAccounts",
+                            "pageKey" => "mailAccounts",
+                        ],
+                        [
+                            "title" => [
+                                "ru" => "Методы oAuth",
+                                "en" => "oAuth methods"
+                            ],
+                            "function" => "oauth",
+                            "pageKey" => "oauth",
+                        ],
+                        
                     ]
                 ]
             ],
@@ -208,7 +226,7 @@ class modules implements externalCallable
             $mod->modPriority=$modPriority;
         }
         $mod->save();
-        
+        static::log($request->instance,__FUNCTION__, "Module ".$mod->name." installed",$request->user,"module",$mod->id,null,logEntry::sevInfo);
         foxRequestResult::throw(201, "Created", $mod);
     }
     

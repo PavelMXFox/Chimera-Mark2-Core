@@ -268,7 +268,12 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
                     $stringRef = (is_bool($ref->{$key}) || ! (is_object($ref->{$key}) || is_array($ref->{$key})));
                     $stringVal = (is_bool($val) || ! (is_object($val) || is_array($val)));
                     
-                    $this->changelog .= "key: " . $key . " changed from " . ($stringRef ? (is_bool($ref->{$key}) ? ($ref->{$key} ? "true" : "false") : $ref->{$key}) : "<" . gettype($ref->{$key}) . ">") . " to " . ($stringVal ? (is_bool($val) ? ($val ? "true" : "false") : $val) : "<" . gettype($val) . ">") . ";\n ";
+                    if (preg_match("/^_/",$key)) {
+                        $this->changelog .= "key: " . $key . " changed \n";
+                    } else {
+                        $this->changelog .= "key: " . $key . " changed from " . ($stringRef ? (is_bool($ref->{$key}) ? ($ref->{$key} ? "true" : "false") : $ref->{$key}) : "<" . gettype($ref->{$key}) . ">") . " to " . ($stringVal ? (is_bool($val) ? ($val ? "true" : "false") : $val) : "<" . gettype($val) . ">") . ";\n ";
+                    }
+                    
                 }
             }
 
@@ -284,17 +289,18 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
         if (property_exists($this, static::$sqlIdx) && ($this->{static::$sqlIdx} == null)) {
             return false;
         }
+        
+        if (!$this->validateDelete()) {
+            throw new \Exception("ValidateDelete failed");
+        }
+        
         if (static::$allowDeleteFromDB) {
-            if ($this->validateDelete()) {
-                $this->checkSql();
-                $this->sql->quickExec("DELETE FROM `" . static::$sqlTable . "` where " . static::$sqlIdx . " = '" . $this->{static::$sqlIdx} . "'");
-                if (! (empty(static::$deletedFieldName))) {
-                    $this->{static::$deletedFieldName} = true;
-                }
-                $this->{static::$sqlIdx} = null;
-            } else {
-                throw new \Exception("ValidateDelete failed");
+            $this->checkSql();
+            $this->sql->quickExec("DELETE FROM `" . static::$sqlTable . "` where " . static::$sqlIdx . " = '" . $this->{static::$sqlIdx} . "'");
+            if (! (empty(static::$deletedFieldName))) {
+                $this->{static::$deletedFieldName} = true;
             }
+            $this->{static::$sqlIdx} = null;
         } elseif (! (empty(static::$deletedFieldName))) {
             $this->checkSql();
             $this->sql->quickExec("UPDATE `" . static::$sqlTable . "` set `" . static::$deletedFieldName . "`='1' where " . $this::$sqlIdx . " = '" . $this->{static::$sqlIdx} . "'");
@@ -582,5 +588,9 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
             $rv[]=new static($row);
         }
         return $rv;
+    }
+    
+    protected static function log(string $instance, $method, string $message, ?user $user=null, ?string $refType=null, ?string $refId=null, string $msgCode=null, ?string $severity="INFO", $payload=null) {
+        return logEntry::add($instance, static::class, $method, $msgCode, $message, $severity, $user,  $refType, $refId, $payload);
     }
 }

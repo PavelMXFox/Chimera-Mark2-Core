@@ -98,7 +98,7 @@ function btnGroupAdd_click() {
 }
 
 function btnGroupDel_click(ref) {
-	var gid=($(ref.currentTarget).attr("groupId"));
+	var gid=($(ref.target).closest("tr").attr("groupId"));
 		var buttons={};
 		buttons[langPack.core.iface.dialodDelButton]=function() { 
 			$("#dialogInfo").dialog("close");
@@ -115,5 +115,5 @@ function btnGroupDel_click(ref) {
 		
 		buttons[langPack.core.iface.dialodCloseButton]=function() {  $("#dialogInfo").dialog("close"); }
 	
-		UI.showInfoDialog(langPack.core.iface.groups.delButtonTitle+" #"+gid+" "+$(ref.currentTarget).attr("xname"),langPack.core.iface.groups.delButtonTitle,buttons);
+		UI.showInfoDialog(langPack.core.iface.groups.delButtonTitle+" #"+gid+" "+$(ref.target).closest("tr").attr("xname"),langPack.core.iface.groups.delButtonTitle,buttons);
 }

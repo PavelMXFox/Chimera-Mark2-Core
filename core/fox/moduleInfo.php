@@ -314,6 +314,7 @@ class moduleInfo extends baseClass implements externalCallable
                 
                 if (empty($request->parameters[0])) {
                     $mod->delete();
+                    static::log($request->instance,__FUNCTION__, "Module ".$mod->name." deleted",$request->user);
                     foxRequestResult::throw(200, "Deleted");
                 }
                 
@@ -324,12 +325,14 @@ class moduleInfo extends baseClass implements externalCallable
                             unset($mod->features[$idx]);
                             $mod->features=array_values($mod->features);
                             $mod->save();
+                            static::log($request->instance,__FUNCTION__, "feature ".common::clearInput($request->requestBody->feature)." deleted from module ".$mod->name,$request->user);
                             foxRequestResult::throw(200, "Deleted");
                         }
                         break;
                         
                     case "config":
                         config::del(common::clearInput($request->requestBody->key), $mod->name);
+                        static::log($request->instance,__FUNCTION__, "config key ".common::clearInput($request->requestBody->key)." deleted from module ".$mod->name,$request->user);
                         foxRequestResult::throw(200, "Deleted");
                         break;
                     default:
@@ -359,6 +362,7 @@ class moduleInfo extends baseClass implements externalCallable
                             $mod->features[]=common::clearInput($request->requestBody->feature);
                             $mod->features=array_values($mod->features);
                             $mod->save();
+                            static::log($request->instance,__FUNCTION__, "feature ".common::clearInput($request->requestBody->feature)." set for module ".$mod->name,$request->user,"module",$user->id,null,logEntry::sevInfo);
                             foxRequestResult::throw(201, "Created");
                         }
                         foxRequestResult::throw(201, "Created");
@@ -366,6 +370,7 @@ class moduleInfo extends baseClass implements externalCallable
                         
                     case "config":
                         config::set(common::clearInput($request->requestBody->key), $request->requestBody->value, $mod->name);
+                        static::log($request->instance,__FUNCTION__, "config key ".common::clearInput($request->requestBody->key)." set for module ".$mod->name,$request->user,"module",$user->id,null,logEntry::sevInfo);
                         foxRequestResult::throw(201, "Created");
                         break;
                     default:

@@ -30,7 +30,7 @@ class ru {
 Добрый день!<br/>
         
 Для подтверждения адреса электронной почты укажите код <span style='color: #ff6f0f'>\${confCodePrint}</span> в форме подтверждения по адресу <a style='color:  #ff6f0f; text-decoration: underline;' href='
-\${sitePrefix}/auth/mailConfirm'>\${sitePrefix}/core/userEmailConfirm</a><br/>
+\${sitePrefix}/core/userEmailConfirm'>\${sitePrefix}/core/userEmailConfirm</a><br/>
 или перейдите по <a style='color:  #ff6f0f; text-decoration: underline;' href='
 \${sitePrefix}/core/userEmailConfirm?code=\${confCodePrint}'>ссылке</a><br/>
 <br/>

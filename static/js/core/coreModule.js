@@ -10,6 +10,8 @@ export var menuSelector={
 	"module":"adminModules",
 	"users":"adminUsers",
 	"group":"adminGrous",
+	mailAccounts:"mailAccounts",
+	oauth: "oauth",
 };
 
 export function load() {
@@ -56,6 +58,16 @@ export function load() {
 			
 		case "userEmailConfirm":
 			import("./userMailConfirm.js").then(function(mod) {
+				mod.load();
+			})
+			break;
+		case "mailAccounts":
+			import("./coreMailAccounts.js").then(function(mod) {
+				mod.load();
+			})
+			break;
+		case "oauth":
+			import("./coreOAuthProfiles.js").then(function(mod) {
 				mod.load();
 			})
 			break;

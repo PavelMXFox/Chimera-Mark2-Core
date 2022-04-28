@@ -112,7 +112,7 @@ class userInvitation extends baseClass  implements externalCallable {
         } catch (\Exception $e) {
             trigger_error($e->getMessage());
         }
-        
+        static::log($request->instance,__FUNCTION__, "User invitation ".$inv->regCode." created.",$request->user,"userInvitation",$inv->id,null,logEntry::sevInfo);
         return $inv;
         
     }
@@ -127,6 +127,7 @@ class userInvitation extends baseClass  implements externalCallable {
         }
         $inv=new static(common::clearInput($request->function));
         $inv->sendEmail();
+        static::log($request->instance,__FUNCTION__, "User invitation ".$inv->regCode." email resent.",$request->user,"userInvitation",$inv->id,null,logEntry::sevInfo);
     }
     
     public static function API_DELETE(request $request) {
@@ -135,6 +136,7 @@ class userInvitation extends baseClass  implements externalCallable {
         }
         $inv=new static(common::clearInput($request->function));
         $inv->delete();
+        static::log($request->instance,__FUNCTION__, "User invitation ".$inv->regCode." deleted.",$request->user,"userInvitation",$inv->id,null,logEntry::sevInfo);
     }
 }
 

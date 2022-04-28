@@ -11,6 +11,7 @@ use fox\oAuthProfile;
 use fox\config;
 use fox\userGroup;
 use fox\authToken;
+use fox\logEntry;
 
 class register implements externalCallable {
     
@@ -33,9 +34,6 @@ class register implements externalCallable {
         $ic=null;
         if (!empty($regCode)) {
             $ic=userInvitation::getByCode($regCode);
-            if (!$ic || ($ic->expireStamp->stamp>time())) {
-                $ic=null;
-            }
         } else {
             $ic =userInvitation::getByEMail($eMail);
         }
@@ -88,11 +86,9 @@ class register implements externalCallable {
         }
 
         if ($ic) {
-            if ($ic && ($ic->expireStamp->stamp<=time())) {
-                foreach ($ic->joinGroupsId as $grid) {
-                    $group = new userGroup($grid);
-                    $group->join($u);
-                }
+            foreach ($ic->joinGroupsId as $grid) {
+                $group = new userGroup($grid);
+                $group->join($u);
             }
             if (!$ic->allowMultiUse) { $ic->delete(); }
         }
@@ -102,7 +98,7 @@ class register implements externalCallable {
         } catch (\Exception $e) {
             trigger_error($e->getMessage());    
         }
-        
+        logEntry::add($request->instance, static::class, __FUNCTION__, null, "User ".$u->login." registered ", "INFO", $u,  "user", $u->id);
         $t = authToken::issue($u, "WEB");
         return [
             "token" => $t->token,
@@ -148,6 +144,8 @@ class register implements externalCallable {
             
             
             $t = authToken::issue($u, "WEB");
+            
+            logEntry::add($request->instance, static::class, __FUNCTION__, null, "Password recovered for user ".$u->login, "INFO", $u,  "user", $u->id);
             return [
                 "token" => $t->token,
                 "expire" => $t->expireStamp->isNull() ? "Never" : $t->expireStamp

@@ -212,6 +212,7 @@ class userGroupMembership extends baseClass implements externalCallable
                 $userGroupMembership->groupId=$userGroup->id;
                 $userGroupMembership->save();
                 $user->flushACRCache();
+                static::log($request->instance,__FUNCTION__, "User ".$user->login ." join group ".$userGroup->name,$request->user,"user",$user->id,null,logEntry::sevInfo);
                 foxRequestResult::throw("201", "Created");
                 break;
                 
@@ -219,6 +220,8 @@ class userGroupMembership extends baseClass implements externalCallable
                 if ($userGroupMembership==null) {
                     foxException::throw("ERR", "Not found", 404, "UGN");
                 }
+                static::log($request->instance,__FUNCTION__, "User ".$userGroupMembership->user->login ." left group ".$userGroupMembership->group->name,$request->user,"user",$userGroupMembership->user->id,null,logEntry::sevInfo);
+                
                 $userGroupMembership->delete();
                 $user->flushACRCache();
                 break;

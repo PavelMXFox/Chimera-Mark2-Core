@@ -3,7 +3,8 @@ import * as UI from './ui.js';
 import { langPack, lpCacheDrop } from './langpack.js';
 
 export function load() {
-	$("body").empty();
+	$("body").empty().addClass("login");
+	$("html").addClass("login");
 
 	if (UI.parceURL().module=='auth' && UI.parceURL().function=='oauth') {
 		let hash = UI.parceURL().id;

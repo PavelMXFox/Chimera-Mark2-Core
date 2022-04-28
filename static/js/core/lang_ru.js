@@ -8,6 +8,8 @@ export var langItem={
 		ok0: "Операция завершена успешно", 
 		dataEmpty: "Информация недоступна, скорее здесь ничего нет.",
 		emptyInvCode: "-нет-",
+		enable: "Активировать",
+		disable: "Заблокировать",
 		dataLoading: "Информация загружается",
 		loginFailedDialogTitle: "Ошибка авторизации",
 		loginFailed401text: "Неправильные имя пользователя или пароль\nУточните данные и попробуйте еще раз",
@@ -17,10 +19,12 @@ export var langItem={
 		active: "Активен",
 		version: "Версия",
 		title: "Наименование",
+		url: "URL",
 		desc: "Описание",
 		installed: "Установлен",
 		install: "Установить",
 		set: "Установить",
+		edit: "Изменить",
 		updated: "Обновлен",	
 		invCode: "invCode",
 		dialodCloseButton: "Закрыть",
@@ -132,6 +136,34 @@ export var langItem={
 				URNF: "Пользователь не найден либо восстановление пароля не предусмотрено спосбом авторизации", 
 				IVCC: "Некорректный код подтверждения. Проверьте правильность кода и повторите попытку.",
 			}
+		},
+		mailAccounts: {
+			allTitle: "Учетные записи электронной почты",
+			addButtonTitle: "Добавить УЗ",
+			address: "Адрес",
+			login: "Логин",
+			module: "Модуль",
+			rxURL: "RX URL",
+			txURL: "TX URL",
+			rxFolder: "Входящие",
+			archiveFolder: "Архив",
+			default: "Основной",
+			setDefault: "Сделать основным",
+			delDialogText: "Удалить аккаунт",
+			setDefaultDialogText: "Установить основным аккаунт",
+			errors: {
+				DDAX: "Нельзя удалить основной аккаунт",
+			}
+		},
+		oauth: {
+			allTitle: "Методы oAuth",
+			addButtonTitle: "Добавить метод",
+			clientId: "ID Клиента",
+			clientKey: "Секретный ключ",
+			callback: "URL возврата",
+			selectPreset: "Выберите шаблон",
+			errors: {
+			}
 		}
 
 	},
@@ -140,7 +172,9 @@ export var langItem={
 		modules: "Модули",
 		users: "Пользователи",
 		groups: "Группы",
-		myprofile: "Мой профиль"
+		myprofile: "Мой профиль",
+		mailAccounts: "Учетные записи ЭП",
+		oauth: "oAuth",
 		
 	},
 	date: {

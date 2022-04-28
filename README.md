@@ -1,9 +1,34 @@
 # Chimera Fox Platform Mark2
+Chimera Fox is a universal framework for quickly creating web applications. The back is written in PHP, and provides basic functions. Front on JS. Interaction via REST.
 
-Полностью новая версия платформы Chimera Fox.
+# How to run in docker
+```
+version: "2"
 
-Предыдущие версии будут поддерживаться только в качестве обновлений безопасности.
+networks:
+  interlink:
 
-Обратная совместимость с предыдущими версиями отсутствует - это основная причина выхода новой платформы - совместимость со старыми версиями занимает слишком много ресурсов на поддержку, а фактически она уже не нужна.
+services:
 
-*Актуальные модули старой версии будут портированы на Mark2*
+fox-web-mk2:
+  restart: always
+  image: mxfox/chimera-mk2-basic:lastest
+  container_name: fox-web-mk2
+  volumes:
+   - ./fox-log-web/logs:/var/log/apache2
+   - ./fox-log-cron/logs:/var/log/fox
+
+  networks:
+   - interlink
+
+  environment:
+   - "FOX_SQLSERVER=XXXXXX"
+   - "FOX_SQLUSER=XXXXX"
+   - "FOX_SQLPASSWD=XXXX"
+   - "FOX_SQLDB=XXXXX"
+   - "FOX_CACHEHOST=memcached"
+   - "FOX_TITLE=Mark2"
+   - "FOX_SITEPREFIX=https://mark2.fox.local"
+   - "FOX_MASTERSECRET=SuperSecretPassword"
+   - "FOX_INIT_PASSWORD=AnotherSuperSecretPassword"
+   ```

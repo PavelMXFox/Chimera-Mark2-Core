@@ -1518,6 +1518,10 @@ div.t_main
 	width: 1681px;
 }
 
+div.mainfame {
+	width: 1676px;
+}
+
 div.t_global
 {
 	width: 1881px;
@@ -1848,6 +1852,10 @@ div.t_main
 	width: 1360px;
 }
 
+div#mainframe {
+	width: 1343px  !important;
+}
+
 div.t_global
 {
 	width: 1560px;
@@ -1924,6 +1932,10 @@ div.t_main
 {
 	width: 1039px;
 	margin-right: 0;
+}
+
+div#mainframe {
+	width: 1022px  !important;
 }
 
 div.t_global
@@ -2039,6 +2051,10 @@ div.t_main
 
 }
 
+div#mainframe {
+	width: 1022px  !important;
+}
+
 div.t_global
 {
 	width: 1035px;
@@ -2133,6 +2149,10 @@ div.t_main
 {
 	margin-right: 0;
 	width: 710px;
+}
+
+div#mainframe {
+	width: 699px !important;
 }
 
 div.t_global

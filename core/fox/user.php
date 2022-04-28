@@ -325,14 +325,17 @@ class user extends baseClass implements externalCallable
         }
         $user = new static(common::clearInput($request->function,"0-9"));
         $user->sendEMailConfirmation();
+        static::log($request->instance,__FUNCTION__, "mailConfirmation sent for user ".$user->login,$request->user,"user",$user->id,null,logEntry::sevInfo);
     }
 
     public static function API_GET_sendEMailConfirmation(request $request) {
         $request->user->sendEMailConfirmation();
+        static::log($request->instance,__FUNCTION__, "mailConfirmation sent for user ".$user->login,$request->user,"user",$user->id,null,logEntry::sevInfo);
     }
     
     public static function API_POST_validateEMailCode(request $request) {
         if ($request->user->validateEMailConfirmation(common::clearInput($request->requestBody->code,"0-9"))) {
+            static::log($request->instance,__FUNCTION__, "Mail address confirmed for user ".$request->user->login,$request->user,"user",$request->user->id,null,logEntry::sevInfo);
             return;
         } else {
             foxException::throw("ERR", "Validation failed", 400);

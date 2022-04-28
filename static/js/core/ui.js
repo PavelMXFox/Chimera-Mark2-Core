@@ -295,7 +295,7 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
     				let password=genPassword();
 					$("#"+item_id).val(password);
 					$("#"+item_id).change();
-					if (typeof(ref.newPasswdGenCallback)) {
+					if (typeof(ref.newPasswdGenCallback)=="function") {
 						ref.newPasswdGenCallback(password);
 					}
 
@@ -763,8 +763,8 @@ export function setTitle(title, desc)
 }
 
 export function initBody() {
-	
-	$("body").empty();
+	$("html").removeClass("login");
+	$("body").empty().removeClass("login");
 	$("<div>",{id: "contextMenu", class: "contextMenu"}).appendTo("body").hide();
 	$("<div>", { class: "t_global"})
 	.appendTo("body")

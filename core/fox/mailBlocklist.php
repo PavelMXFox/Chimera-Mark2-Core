@@ -57,6 +57,7 @@ class mailBlocklist extends baseClass implements externalCallable {
         
         $bl=new static();
         $bl->address=$eMail;
+        static::log($request->instance,__FUNCTION__, "Address ".$eMail." added to blockList",$request->user,"eMailAddress",$eMail,null,logEntry::sevInfo);
         $bl->save();
     }
     
@@ -73,6 +74,7 @@ class mailBlocklist extends baseClass implements externalCallable {
         
         if ($bl = static::getByAddress($eMail)) {
             $bl->delete();
+            static::log($request->instance,__FUNCTION__, "Address ".$eMail." removed from blockList",$request->user,"eMailAddress",$eMail,null,logEntry::sevInfo);
             foxRequestResult::throw("200", "Deleted");
         } else {
             foxException::throw("WARN", "Not found", 404,"ANF");

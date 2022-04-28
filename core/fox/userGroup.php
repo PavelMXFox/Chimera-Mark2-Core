@@ -182,7 +182,7 @@ class userGroup extends baseClass implements externalCallable
         $group = new static(common::clearInput($request->requestBody->groupId,"0-9"));
         $group->dropAccessRule(common::clearInput($request->requestBody->rule), common::clearInput($request->requestBody->module));
         $group->save();
-        
+        static::log($request->instance,__FUNCTION__, "Rule ".common::clearInput($request->requestBody->rule)."@".common::clearInput($request->requestBody->module)." removed from group ".$group->name,$request->user,"userGroup",$group->id,null,logEntry::sevInfo);
         foxRequestResult::throw(200, "Deleted");
     
     }
@@ -194,6 +194,7 @@ class userGroup extends baseClass implements externalCallable
         }
         $group = new static(common::clearInput($request->requestBody->groupId,"0-9"));
         $group->addAccessRule(common::clearInput($request->requestBody->rule), ($request->requestBody->forAll=="1")?"<all>":common::clearInput($request->requestBody->module));
+        static::log($request->instance,__FUNCTION__, "Rule ".common::clearInput($request->requestBody->rule)."@".common::clearInput($request->requestBody->module)." added for group ".$group->name,$request->user,"userGroup",$group->id,null,logEntry::sevInfo);
         $group->save();
         
     }
@@ -233,6 +234,7 @@ class userGroup extends baseClass implements externalCallable
                 $group->name=$grName;
                 $group->isList=$request->requestBody->isList==1;
                 $group->save();
+                static::log($request->instance,__FUNCTION__, "UserGroup ".$group->name." created.",$request->user,"userGroup",$group->id,null,logEntry::sevInfo);
                 foxRequestResult::throw(201, "Created",$group);
                 break;
             case "DELETE":
@@ -242,6 +244,8 @@ class userGroup extends baseClass implements externalCallable
                 }
                 
                 $group->delete();
+                static::log($request->instance,__FUNCTION__, "UserGroup ".$group->name." deleted.",$request->user,"userGroup",$group->id,null,logEntry::sevInfo);
+                
                 throw new foxRequestResult("Deleted",200);
                 break;
             default:

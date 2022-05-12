@@ -163,7 +163,7 @@ class userGroup extends baseClass implements externalCallable
         if (! $request->user->checkAccess("adminUserGroups", "core")) {
             throw new foxException("Forbidden", 403);
         }
-        return static::search();
+        return static::search()->result;
     }
     
     public static function API_POST_members(request $request)
@@ -223,7 +223,7 @@ class userGroup extends baseClass implements externalCallable
                 
             case "PUT":
                 $grName=common::clearInput($request->requestBody->name);
-                $groups = userGroup::search($grName);
+                $groups = userGroup::search($grName)->result;
                 foreach ($groups as $group) {
                     if (trim(strtolower($group->name))==trim(strtolower($grName))) {
                         foxException::throw("ERR", "Already exists", 409, "GAX");

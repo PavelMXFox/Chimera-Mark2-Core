@@ -185,17 +185,17 @@ class mailMessage extends baseClass {
                 $ref = explode(" ", $val);
                 $this->refIds=[];
                 foreach ($ref as $ref_item) {
-                    $ref_item=preg_replace("!^\<|\>$!", '', $ref_item);
+                    $ref_item=preg_replace("!(^\<)|(\>$)!", '', $ref_item);
                     array_push($this->refIds, $ref_item);
                 }
                 break;
                 
             case "inReplyTo":
-                $this->inReptyTo=preg_replace("!^\<|\>$!", '', $val);
+                $this->inReptyTo=preg_replace("!(^\<)|(\>$)!", '', $val);
                 break;
 
             case "messageId":
-                $this->messageId=preg_replace("!^\<|\>$!", '', $val);
+                $this->messageId=preg_replace("!(^\<)|(\>$)!", '', $val);
                 break;
             case "subject":
                 $this->__subject=base64_encode($val);
@@ -301,7 +301,6 @@ class mailMessage extends baseClass {
         
         if ($this->account->txProto!='smtp' || $this->account->txServer == null) {
             throw  new \Exception("This account can't send messages");
-            return false;
         }
         $mail = new PHPMailer(true);
         $mail->CharSet = PHPMailer::CHARSET_UTF8;

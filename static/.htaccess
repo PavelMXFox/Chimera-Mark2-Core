@@ -2,7 +2,7 @@
 RewriteEngine On
 
 RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule . - [S=5]
+RewriteRule . - [S=6]
 
 RewriteRule "^theme/([^/]+)/main.css" "/modules/$1/theme/main.css" [L]
 RewriteRule "^theme/([^/]+)/img/([0-9a-zA-Z\.\-\_]*)" "/modules/$1/theme/img/$2" [L]
@@ -10,3 +10,4 @@ RewriteRule "^theme/([^/]+)/font/([0-9a-zA-Z\.\-\_]*)" "/modules/$1/theme/font/$
 RewriteRule "^theme/([^/]+)/css/([0-9a-zA-Z\.\-\_]*\.css)" "/modules/$1/theme/css/$2" [L]
 
 RewriteRule "^js/([^/]+)/([0-9a-zA-Z\.\-\_]*\.js)" "/modules/$1/js/$2" [L]
+RewriteRule "^css/([^/]+)/([0-9a-zA-Z\.\-\_]*\.css)" "/modules/$1/css/$2" [L]

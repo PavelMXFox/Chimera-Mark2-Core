@@ -23,7 +23,7 @@ class mailAddress {
             $this->__set("address", $address);
         } else {
             $res=[];
-            $name = preg_replace('!^[\"\ \t]*|[\"\ \t]*$!', '', $name);
+            $name = preg_replace('!(^[\"\ \t]*)|([\"\ \t]*$)!', '', $name);
             if(preg_match("/([^\<\>]*) \<([^\<\>]*)\>/", $name, $res)) {
                 $this->address=$res[2];
                 $this->name=$res[1];
@@ -36,7 +36,7 @@ class mailAddress {
             }
         }
         
-        $this->name = preg_replace('!^[\"]*|[\"]*$!', '', $this->name);
+        $this->name = preg_replace('!(^[\"]*)|([\"]*$)!', '', $this->name);
     }
     
     

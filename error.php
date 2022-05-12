@@ -35,10 +35,11 @@ if (array_search($req[1], $jsons)!==false) {
 }
 
 ?>
+<!DOCTYPE>
+<html lang="en" class=login>
+<head><title>Error <?php print $code; ?></title></head>
 
-<html  class=login>
-
-<body  class=login style="
+<body class=login style="
     background-image: url(/static/theme/chimera/img/chimera_logo.svg);
     min-width: inherit;
     min-height: 100%;
@@ -48,7 +49,7 @@ if (array_search($req[1], $jsons)!==false) {
     background-position-y: center;
     background-color: #150007;">
 
-<div style=' text-align: center; width: 100%; heigth: 100%;'>
+<div style=' text-align: center; width: 100%; height: 100%;'>
 
 </div>
 
@@ -56,7 +57,6 @@ if (array_search($req[1], $jsons)!==false) {
 	border: 2px solid red;
    background-color: rgba(0, 0, 0, 0.85);
 	
-	margin: 0; 
 	padding: 70 0 0 0; 
 	position: absolute;
 	left: calc(50% - 250px);
@@ -68,7 +68,9 @@ if (array_search($req[1], $jsons)!==false) {
 	vertical-align: center; 
 	font-family: 'Fira Mono', monospace; 
 	font-weight: 200; 
-	font-size: 32px; color: #FF3500; margin: 1%">
+	font-size: 32px; 
+	color: #FF3500; 
+	margin: 1%">
 <?php 
 print "ERROR: $code<br/>";
 if (array_key_exists($code, $codes)) {

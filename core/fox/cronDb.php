@@ -60,7 +60,7 @@ class cronDb {
         }
         $rv=[];
         while ($row = $r->fetchArray(SQLITE3_ASSOC)) {
-            array_push($rv, $row);;
+            array_push($rv, $row);
         }
         
         return $rv;

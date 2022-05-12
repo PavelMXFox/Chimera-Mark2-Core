@@ -109,7 +109,6 @@ class sql
             mysqli_set_charset($this->mysqli, "utf8");
             if (! $this->mysqli) { // Если дескриптор равен 0 соединение не установлено
                 throw new Exception("SQL Connection to $this->server failed");
-                exit();
             }
             $this->connected = true;
         }
@@ -135,7 +134,6 @@ class sql
             }
             ;
             return null;
-            exit();
         }
         return $result;
     }
@@ -194,7 +192,6 @@ class sql
             if (! $this->stmt) {
                 $err = 'ERR:EXEC 1P' . mysqli_errno($this->mysqli) . ' ' . mysqli_error($this->mysqli);
                 throw new Exception($err, mysqli_errno($this->mysqli));
-                exit();
             }
             call_user_func_array(array(
                 $this->stmt,
@@ -205,7 +202,6 @@ class sql
                 $errNo = mysqli_errno($this->mysqli);
                 $this->stmt->close();
                 throw new Exception($err, $errNo);
-                exit();
             }
             return true;
         }
@@ -218,7 +214,6 @@ class sql
                 $this->stmt->close();
             }
             throw new \Exception('ERR:EXEC 3P' . mysqli_errno($this->mysqli) . '  ' . mysqli_error($this->mysqli), mysqli_errno($this->mysqli));
-            exit();
         }
         $this->stmt->close();
         return true;
@@ -232,9 +227,9 @@ class sql
     function paramAdd($sqlParamName, $paramValue, $setNull = false)
     {
         if ($this->queryType == "insert") {
-            return $this->paramAddInsert($sqlParamName, $paramValue, $setNull);
+            $this->paramAddInsert($sqlParamName, $paramValue, $setNull);
         } elseif ($this->queryType == "update") {
-            return $this->paramAddUpdate($sqlParamName, $paramValue, $setNull);
+            $this->paramAddUpdate($sqlParamName, $paramValue, $setNull);
         }
     }
 

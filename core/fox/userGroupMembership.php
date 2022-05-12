@@ -158,7 +158,7 @@ class userGroupMembership extends baseClass implements externalCallable
         $res=static::search(null,$pageSize,$page,[
             "user"=>$user,
             "group"=>$group,
-        ]);
+        ])->result;
         
         $rv=[];
         foreach ($res as $ugm) {

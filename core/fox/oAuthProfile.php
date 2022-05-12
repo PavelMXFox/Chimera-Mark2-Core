@@ -75,7 +75,7 @@ class oAuthProfile extends baseClass implements externalCallable {
         if (! $request->user->checkAccess("adminAuthMethods", "core")) {
             throw new foxException("Forbidden", 403);
         }
-        return static::search();
+        return static::search()->result;
     }
 
     public static function APIX_GET_disable(request $request) {

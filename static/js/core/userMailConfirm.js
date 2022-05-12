@@ -37,7 +37,6 @@ function doValidation(code) {
 			code: code,
 		},
 		method: "core/user/validateEMailCode",
-		errDict: langPack.core.iface.users.errors,
 		onSuccess: function(json) {
 			UI.closeDialog('addgrp');
 			

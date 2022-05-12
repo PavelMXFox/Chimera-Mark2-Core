@@ -42,7 +42,6 @@ class common
                 if (isset($_GET[$name])) {
                     $val = preg_replace('![^' . $regex . ']+!', '', $_GET[$name]);
                 }
-                ;
             }
         } else {
 
@@ -52,10 +51,8 @@ class common
                 } else {
                     $val = "";
                 }
-                if ($val == "") {
-                    if (isset($_GET[$name])) {
-                        $val = preg_replace("![\'\"]+!", '\"', $_GET[$name]);
-                    }
+                if ($val == "" && isset($_GET[$name])) {
+                    $val = preg_replace("![\'\"]+!", '\"', $_GET[$name]);
                 }
             } else {
                 if (isset($_POST[$name])) {
@@ -98,17 +95,13 @@ class common
         mt_srand((double) microtime() * 10000); // optional for php 4.2.0 and up.
         $charid = strtoupper(md5(uniqid(rand(), true)));
         $hyphen = chr(45); // "-"
-        $uuid = substr($charid, 0, 8) . $hyphen . substr($charid, 8, 4) . $hyphen . substr($charid, 12, 4) . $hyphen . substr($charid, 16, 4) . $hyphen . substr($charid, 20, 12);
+        return substr($charid, 0, 8) . $hyphen . substr($charid, 8, 4) . $hyphen . substr($charid, 12, 4) . $hyphen . substr($charid, 16, 4) . $hyphen . substr($charid, 20, 12);
 
-        return $uuid;
     }
 
     static function getGUID()
     {
-        $cUuid = getGUIDc();
-        $uuid = chr(123) . // "{"
-        $cUuid . chr(125); // "}"
-        return $uuid;
+        return chr(123) . getGUIDc() . chr(125);
     }
 
     static function fullname2qname($first, $mid, $last)
@@ -119,7 +112,6 @@ class common
     static function text2html($src)
     {
         $src = preg_replace("/[\n]/", "</br>", $src);
-        // $src=preg_replace("/[\cr\<\>]/"," ",$src);
         return $src;
     }
 

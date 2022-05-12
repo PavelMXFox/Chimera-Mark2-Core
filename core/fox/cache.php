@@ -41,7 +41,7 @@ class cache
             if (empty($port)) {
                 $port = config::get("cachePort");
             }
-            ;
+            
             if (empty($port)) {
                 $port = 11211;
             }
@@ -104,8 +104,7 @@ class cache
         if ($xval==null || $xval=="null") { return null; }
         $rv= json_decode($this->mcd->get($this->prefix . "." . $key), $array);
         if ($rv !== null) { return $rv; }
-        $rv= json_decode(xcrypt::decrypt($this->mcd->get($this->prefix . "." . $key)), $array);
-        return $rv;
+        return json_decode(xcrypt::decrypt($this->mcd->get($this->prefix . "." . $key)), $array);
     }
     
     public function del($key) {

@@ -13,7 +13,7 @@ var codes={
 };
 
 export function showError(code, message) {
-	if (message==undefined) { message=codes[code]};
+	if (message==undefined) { message=codes[code]}
 	if (message==undefined) { message="Internal server error"}
 	$("<div>", { class: "error blanker bggray"}).appendTo("body");
 	$("<div>", { class: "error error_banner",html: "ERROR "+code+"<br/>"+message}).appendTo("body");
@@ -28,9 +28,9 @@ export function click (ref) {
 }
  
 export function addButton(id, icon, title, color, onClick, cssClass, style) {
-	
+	var opts;
 	if (typeof(id)=='object') {
-		var opts=id;
+		opts=id;
 		id=opts.id;
 		icon=opts.icon;
 		title=opts.title;
@@ -191,7 +191,7 @@ export function createTabsPanel(panels,ref) {
 	$.each(panels,function (index,panel) {
 		if (panel.id==undefined) {panel.id=index;}
 
-		$("<li>",{append: $("<a>",{href: "#tab-"+panel.id, text: panel.title})})
+		$("<li>",{append: $("<a>",{href: "#tab-"+panel.id, id: "a-tab-"+panel.id, text: panel.title})})
 		.appendTo("#item_tabs_ul_list");
 		$("<div>", { 
 			id: "tab-"+panel.id, 
@@ -262,12 +262,13 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
 
 		let item_id=ref.item;
 		let args = ref.args;
-		if (ref.args==undefined) {
+		if (ref.args==undefined && ref.val != undefined) {
 			args = ref.val;
+		} else {
+			args={};	
 		}
 		switch(type) {
-  			case 'password':
-  				
+  			case 'password':				
 	    		item = $("<input>", {class: "i", id: ref.item, name: name, type:'password',width: 'calc(100% - 44px)'})
 	    		.add($("<div>",{class: "button short", style: "width: 25px; margin-right: 0; margin-left: 2; padding: 0; padding-top: 1; font-size: 13px;",append: $("<i>",{class: 'far fa-eye'})
 	    		})
@@ -282,6 +283,13 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
 	    		}));
 	    		break
   			case 'passwordNew':
+				if (args.chars==undefined) {
+					switch(args.type) {
+						case "num":
+							args.chars="0123456789";
+					}
+				}
+
   				item = $("<input>", {class: "i", id: ref.item, name: name, width: 'calc(100% - 44px)'})
 	    		.add($("<div>",{
 	    			class: "button short", 
@@ -292,7 +300,7 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
 					if ($("#"+item_id).prop("disabled")) {
 						return;
 					}
-    				let password=genPassword();
+    				let password=genPassword(args.chars, args.length);
 					$("#"+item_id).val(password);
 					$("#"+item_id).change();
 					if (typeof(ref.newPasswdGenCallback)=="function") {
@@ -594,6 +602,16 @@ export function collectForm(formid, getall, withIDS, withREF, validate)
 		} catch {
 			
 		}
+	data.getVals=function() {
+		let rv={};
+		$.each(data,function(idx,val) {
+			if (typeof(val) =='object') {
+				rv[idx]=val.val;
+			}
+		});
+		
+		return rv;
+	}
 	return data;
 }
 
@@ -661,13 +679,13 @@ export function on_valChanged(t_this) {
 export function progressBar_init()
  {
 	$('.progressbar').each(function() {
-   	el = $(this);
-   	val = parseInt(el.attr('value'));
-
-   	el.progressbar({
-   		value: 0
-   	});
-   progressBar_update(el, val);
+	   	let el = $(this);
+	   	let val = parseInt(el.attr('value'));
+	
+	   	el.progressbar({
+	   		value: 0
+	   	});
+	   progressBar_update(el, val);
 
 	});
 }	
@@ -990,7 +1008,7 @@ Number.prototype.pad = function(size) {
 			}							
 			
 			if (mode=='getPage') {
-				return sessionStorage.getItem($(this).prop('foxPager_prefix')+"pager");c
+				return sessionStorage.getItem($(this).prop('foxPager_prefix')+"pager");
 			}
     		this.each(function(rid,ref) {
 				
@@ -1070,7 +1088,7 @@ Number.prototype.pad = function(size) {
 						}).appendTo(ref);
 						
 					} else if (mode=='update') {
-						prefix = $(ref).prop("foxPager_prefix");
+						let prefix = $(ref).prop("foxPager_prefix");
 						sessionStorage.setItem(prefix+"pager", options.page);
 						$(ref).prop('foxPager_page',options.page);
 						$(ref).prop('foxPager_pages',options.pages);

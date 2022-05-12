@@ -105,7 +105,6 @@ try {
     print(json_encode(["error"=>["errCode"=>500,"message"=>"Internal server error", "xCode"=>"ERR"]]));
     header('HTTP/1.0 500 Internal server error', true, 500);
     throw($e);
-    exit;
 }
 exit;
 

@@ -26,16 +26,14 @@ $m = fox\modules::list();
 $initUser=empty(config::get("INIT_USERNAME"))?"admin":config::get("INIT_USERNAME");
 $initPass=empty(config::get("INIT_PASSWORD"))?"chimera":config::get("INIT_PASSWORD");
 
-//if (moduleInfo::getCount() ==0) {
-    // installing modules
-    foreach ($m as $mod) {
-        if (array_key_exists($mod->name, modules::pseudoModules) && !$mod->getInstances()) {
-            print "Install module ".$mod->name."...";
-            $mod->save();
-            print "OK\n";
-        }
+// installing modules
+foreach ($m as $mod) {
+    if (array_key_exists($mod->name, modules::pseudoModules) && !$mod->getInstances()) {
+        print "Install module ".$mod->name."...";
+        $mod->save();
+        print "OK\n";
     }
-//}
+}
 
 if (company::getCount()==0) {
     

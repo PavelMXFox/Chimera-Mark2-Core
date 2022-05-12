@@ -145,7 +145,6 @@ class oAuthClient {
         } else {
             trigger_error(json_encode($res));
             throw new foxException("Invalid token");
-            exit;
         }
     }
     

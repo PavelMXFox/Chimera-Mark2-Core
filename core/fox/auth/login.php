@@ -17,6 +17,7 @@ use fox\foxException;
 use fox\auth;
 use fox\authToken;
 use fox\request;
+use fox\foxRequestResult;
 
 class login implements externalCallable
 {
@@ -26,7 +27,7 @@ class login implements externalCallable
         switch ($request->method) {
             case "POST":
                 if ($request->authOK) {
-                    return;
+                    throw new foxRequestResult("OK",200);
                 }
                 if (! (gettype($request->requestBody) == "object" && property_exists($request->requestBody, "login") && property_exists($request->requestBody, "password"))) {
                     throw new foxException("Bad request", 400);

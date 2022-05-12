@@ -16,7 +16,7 @@ use Exception;
 class fileConverter
 {
 
-    public static function convert($src, $dst = null, $type, $url = null)
+    public static function convert($src, $dst, $type, $url = null)
     {
         if (empty($url)) {
             $url = config::get("converterURL");
@@ -28,8 +28,6 @@ class fileConverter
         if (! file_exists($src) || is_dir($src)) {
             throw new \Exception("Invalid source file $src");
         }
-
-        $boundary = '------------chimera---' . substr(md5(rand(0, 32000) . '---fox-----'), 0, 10);
 
         // "засечка" :P
         $boundary = md5(rand(0, 32000));

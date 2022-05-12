@@ -20,8 +20,7 @@ class auth extends baseClass implements noSqlMigration
         $sql = sql::getConnection();
         $res = $sql->quickExec1Line("select * from `" . user::$sqlTable . "` where `login` = '" . common::clearInput($login) . "' and `secret` = '" . xcrypt::hash($password) . "'");
         if ($res) {
-            $u = new user($res);
-            return $u;
+            return new user($res);
         } else {
             return false;
         }

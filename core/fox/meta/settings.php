@@ -23,7 +23,7 @@ class settings implements externalCallable
 {
     public static function APICall(request $request)
     {
-        $profiles = oAuthProfile::search();
+        $profiles = oAuthProfile::search()->result;
         $oauth=[];
         foreach ($profiles as $p) {
             if ($p->enabled) {

@@ -14,10 +14,19 @@ namespace fox;
 class baseModule
 {
 
+    /**
+     * @deprecated - moved into module.json
+     */
     public static $title = "Basic Module Template";
 
+    /**
+     * @deprecated - moved into module.json
+     */
     public static $desc = "Базовый класс модуля-заглушки";
 
+    /**
+     * @deprecated - moved into module.json
+     */
     public static $version = "0.0.0";
 
     public static $type = "fake";
@@ -71,8 +80,6 @@ class baseModule
     public static function getModInfo(): moduleInfo
     {
         $mi = new moduleInfo();
-        $mi->title = static::$title;
-        $mi->modVersion = static::$version;
         $mi->name = $mi->namespace = substr(static::class, 0, strrpos(static::class, '\\'));
         $mi->features = static::$features;
         $mi->isTemplate = true;

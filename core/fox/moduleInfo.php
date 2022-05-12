@@ -226,6 +226,17 @@ class moduleInfo extends baseClass implements externalCallable
         return $modsInstalled[$modInstanceName];
     }
     
+    public static function getByFeature(string $feature) {
+        $rv=[];
+        foreach(moduleInfo::getAll() as $mod) {
+            if (array_search($feature, $mod->features) !==false) {
+                $rv[]=$mod;
+            }
+        }
+        
+        return $rv;
+    }
+    
     public function getInstances()
     {
         if (! $this->isTemplate) {
@@ -245,6 +256,11 @@ class moduleInfo extends baseClass implements externalCallable
     public static function load(string $modName)
     {}
 
+    public function newClass() {
+        $ref=$this->namespace.'\module';
+        return new $ref();
+    }
+    
     public function export() {
         $rv=parent::export();
         if ($this->isTemplate) {
@@ -362,7 +378,7 @@ class moduleInfo extends baseClass implements externalCallable
                             $mod->features[]=common::clearInput($request->requestBody->feature);
                             $mod->features=array_values($mod->features);
                             $mod->save();
-                            static::log($request->instance,__FUNCTION__, "feature ".common::clearInput($request->requestBody->feature)." set for module ".$mod->name,$request->user,"module",$user->id,null,logEntry::sevInfo);
+                            static::log($request->instance,__FUNCTION__, "feature ".common::clearInput($request->requestBody->feature)." set for module ".$mod->name,$request->user,"module",$mod->id,null,logEntry::sevInfo);
                             foxRequestResult::throw(201, "Created");
                         }
                         foxRequestResult::throw(201, "Created");
@@ -370,7 +386,7 @@ class moduleInfo extends baseClass implements externalCallable
                         
                     case "config":
                         config::set(common::clearInput($request->requestBody->key), $request->requestBody->value, $mod->name);
-                        static::log($request->instance,__FUNCTION__, "config key ".common::clearInput($request->requestBody->key)." set for module ".$mod->name,$request->user,"module",$user->id,null,logEntry::sevInfo);
+                        static::log($request->instance,__FUNCTION__, "config key ".common::clearInput($request->requestBody->key)." set for module ".$mod->name,$request->user,"module",$mod->id,null,logEntry::sevInfo);
                         foxRequestResult::throw(201, "Created");
                         break;
                     default:

@@ -13,7 +13,9 @@ namespace fox;
  */
 class modules implements externalCallable
 {
-
+    public const modulesDir=__DIR__ . "/../../modules/";
+    public const packagesDir=__DIR__ . "/../../packages/";
+    
     // not implemented yet
     public const pseudoModules = [
         "core" => [
@@ -138,8 +140,18 @@ class modules implements externalCallable
             if (array_key_exists($modName, static::pseudoModules)) {
                 $modInfo = new moduleInfo(static::pseudoModules[$modName]);
             } else {
-                $modClass = $modName . "\module";
-                $modInfo = (new $modClass())::getModInfo();
+                try {
+                    $modClass = $modName . "\module";
+                    $modInfo = (new $modClass())::getModInfo();
+                    $modDesc=json_decode(file_get_contents(static::modulesDir . "/" . $modName . "/module.json"));
+                    if (empty($modDesc)) { throw new foxException("Unable to read module.json"); }
+                    if ($modDesc->name != $modInfo->name) { throw new foxException("Module name mismatch for ".$modInfo->name); }
+                    $modInfo->title=$modDesc->title;
+                    $modInfo->modVersion=$modDesc->version;
+                } catch (\Exception $e) {
+                    trigger_error($e->getMessage());
+                    continue;
+                }
             }
             $rv[$modInfo->name] = $modInfo;
         }
@@ -152,20 +164,27 @@ class modules implements externalCallable
         return moduleInfo::getAll();
     }
 
+    public static function getByFeature(string $feature) {
+        return moduleInfo::getByFeature($feature);
+    }
+    
     public static function scan()
     {
         $rv = [];
         foreach (static::pseudoModules as $key => $val) {
             $rv[] = $key;
         }
-        foreach (scandir(__DIR__ . "/../../modules/") as $dir) {
+        foreach (scandir(static::modulesDir) as $dir) {
             if (preg_match("/^[.]/", $dir)) {
                 continue;
             }
-            if (! is_dir(__DIR__ . "/../../modules/" . $dir)) {
+            if (! is_dir(static::modulesDir . $dir)) {
                 continue;
             }
-            if (! file_exists(__DIR__ . "/../../modules/" . $dir . "/module.php") && ! file_exists(__DIR__ . "/../../modules/" . $dir . "/Autoloader.php")) {
+            if (! file_exists(static::modulesDir . $dir . "/module.json")) {
+                continue;
+            }
+            if (! file_exists(static::modulesDir . $dir . "/module.php") && ! file_exists(static::modulesDir . $dir . "/Autoloader.php")) {
                 continue;
             }
             $rv[] = $dir;
@@ -226,7 +245,7 @@ class modules implements externalCallable
             $mod->modPriority=$modPriority;
         }
         $mod->save();
-        static::log($request->instance,__FUNCTION__, "Module ".$mod->name." installed",$request->user,"module",$mod->id,null,logEntry::sevInfo);
+        logEntry::add($request->instance, static::class, __FUNCTION__, null, "Module ".$mod->name." installed", "INFO", $request->user,  "module", $mod->id);
         foxRequestResult::throw(201, "Created", $mod);
     }
     

@@ -14,7 +14,6 @@
 
 if (php_sapi_name() != 'cli') {
     throw new Exception("This script can be run via CLI only");
-    exit;
 }
 
 use fox\moduleInfo;
@@ -134,7 +133,7 @@ while(($xpid=pcntl_wait($status,WNOHANG)) >=0) {
     foreach($pids as $pid=>&$ttl) {
         if ($ttl < $ttlc) {
             print "Kill PID ".$pid." by TTL\n";
-            var_dump(posix_kill($pid, SIGKILL));
+            posix_kill($pid, SIGKILL);
             $ttl+=5;
         }
     }

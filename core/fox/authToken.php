@@ -155,9 +155,7 @@ class authToken extends baseClass
         } else if ($t->token1 == $token1 && $t->token2 != $token2 && $token2 != $t->token2b) {
             // token2 failed - token are compromised
             trigger_error("Token #".$t->id." are compromised!");
-            // $t->delete();
-        } else {
-            
+            $t->delete();
         }
         
         $sql->quickExec("COMMIT");
@@ -189,7 +187,6 @@ class authToken extends baseClass
 
         $t->expireStamp = empty($expireInDays) ? (new time()) : (new time(time() + ($expireInDays * 86400)));
         $t->renewStamp = empty($renewTTL) ? (new time()) : (new time(time() + ($renewTTL * 60)));
-        ;
 
         for ($i = 0; $i < 32; $i ++) {
             $token = substr(preg_replace("/[-_+=\\/]/", "", base64_encode(random_bytes(64))), 0, 64);
@@ -217,7 +214,6 @@ class authToken extends baseClass
         $renewTTL = config::get("TOKEN_RENEW_" . $this->type) === null ? static::tokenTypes[$this->type]["renewTTL"] : config::get("TOKEN_RENEW_" . $this->type);
 
         $this->renewStamp = empty($renewTTL) ? (new time()) : (new time(time() + ($renewTTL * 60)));
-        ;
         $this->token2b = $this->token2;
         $this->token2 = substr(preg_replace("/[-_+=\\/]/", "", base64_encode(random_bytes(64))), 0, 64);
 

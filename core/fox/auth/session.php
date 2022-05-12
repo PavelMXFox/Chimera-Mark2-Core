@@ -16,6 +16,7 @@ use fox\externalCallable;
 use fox\foxException;
 use fox\request;
 use fox\modules;
+use fox\foxRequestResult;
 
 class session implements externalCallable
 {
@@ -29,13 +30,13 @@ class session implements externalCallable
                 }
 
                 $request->token->delete();
-                return;
+                foxRequestResult::throw(200,"Deleted");
             case "GET":
                 if ($request->authOK) {
                     $modules=[];
                     $i = 0;
                     foreach (modules::listInstalled() as $mod) {
-                        if (array_search("menu", $mod->features) !== false && $request->user->checkAccess($mod->globalAccessKey, $mod->name) && ! empty($mod->menuItem)) {
+                        if ($request->user->checkAccess($mod->globalAccessKey, $mod->name)) {
                             $i ++;
                             $modules[($mod->modPriority * 100) + $i] = [
                                 "name" => $mod->name,
@@ -54,8 +55,10 @@ class session implements externalCallable
                         "modules" => $modules
                     ];
                 }
-                ;
                 throw new foxException("Unauthorized", 401);
+                break;
+            default:
+                throw new foxException("Method not allowe", 405);
                 break;
         }
     }

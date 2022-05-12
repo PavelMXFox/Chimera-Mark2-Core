@@ -79,7 +79,11 @@ export function boot(xlite) {
 }
 
 export function smartClick(ref) {
-	UI.setLocation($(ref.currentTarget).prop("href"));	
+	if(typeof(ref)=="string") {
+		UI.setLocation(ref);
+	} else {
+		UI.setLocation($(ref.currentTarget).prop("href"));
+	}	
 	boot(true);
 	return false;	
 }

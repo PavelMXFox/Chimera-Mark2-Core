@@ -49,7 +49,7 @@ class oauth implements externalCallable
             case "POST":
                 $profile = oAuthProfile::getByHash(common::clearInput($request->requestBody->hash));
                 $oac = $profile->getClient(config::get("SITEPREFIX")."/auth/oauth");
-                $xTokens=$oac->getTokenByCode(common::clearInput($request->requestBody->code));
+                $oac->getTokenByCode(common::clearInput($request->requestBody->code));
                 $userInfo=$oac->getUserInfo();
                 $userRefId=$profile->id.":".$userInfo->sub;
                 $u=user::getByRefID("oauth",$userRefId);
@@ -64,8 +64,9 @@ class oauth implements externalCallable
                     "expire" => $t->expireStamp->isNull() ? "Never" : $t->expireStamp
                 ];
                 
-                return $u;
                 break;
+            default:
+                throw new foxException("Method not implemented",405);
         }
     }
 }

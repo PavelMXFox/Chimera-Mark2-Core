@@ -49,7 +49,6 @@ class register implements externalCallable {
             if (!$u) { 
                 
                 $u = new user();
-               // $u->login=uniqid();
                 $u->eMail=$eMail;
                 $u->authType="oauth";
                 $u->authRefId=$userRefId;

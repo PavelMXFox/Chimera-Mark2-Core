@@ -305,7 +305,7 @@ class user extends baseClass implements externalCallable
         if (! $request->user->checkAccess("adminUsers", "core")) {
             throw new foxException("Forbidden", 403);
         }
-        return static::search();
+        return static::search()->result;
     }
     
     public static function API_POST_search(request $request) {
@@ -315,7 +315,7 @@ class user extends baseClass implements externalCallable
         $pageSize=common::clearInput($request->requestBody->pageSize,"0-9");
         if (empty($pageSize)) { $pageSize=$request->user->settings["pageSize"];}
         
-        return static::search(common::clearInput($request->requestBody->pattern), $pageSize);
+        return static::search(common::clearInput($request->requestBody->pattern), $pageSize)->result;
         
     }
     
@@ -330,7 +330,7 @@ class user extends baseClass implements externalCallable
 
     public static function API_GET_sendEMailConfirmation(request $request) {
         $request->user->sendEMailConfirmation();
-        static::log($request->instance,__FUNCTION__, "mailConfirmation sent for user ".$user->login,$request->user,"user",$user->id,null,logEntry::sevInfo);
+        static::log($request->instance,__FUNCTION__, "mailConfirmation sent for user ".$request->user->login,$request->user,"user",$request->user->id,null,logEntry::sevInfo);
     }
     
     public static function API_POST_validateEMailCode(request $request) {
@@ -341,21 +341,6 @@ class user extends baseClass implements externalCallable
             foxException::throw("ERR", "Validation failed", 400);
         }
     }
-    
-    public static function APICall(request $request) {
-        if (!empty($request->function)) {
-            throw new foxException("Method not allowed",405);
-        }
-        
-        switch ($request->method) {
-            
-            default:
-                throw new foxException("Method not allowed",405);
-        }
-        
-    }
-    
-
 }
 
 ?>

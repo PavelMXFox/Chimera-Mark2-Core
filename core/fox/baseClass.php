@@ -100,7 +100,7 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
                     case "object":
                         if (! empty($val::$SQLType)) {
                             $type = $val::$SQLType;
-                        } elseif (($val instanceof stringExportable)) {
+                        } elseif ($val instanceof stringExportable) {
                             $type = "VARCHAR(255)";
                         } elseif ($val instanceof \JsonSerializable) {
                             $type = "VARCHAR(255)";
@@ -134,18 +134,19 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
         if ($this->sql === null) {
             $this->sql = sql::getConnection();
         }
-        return;
     }
 
     protected function __xConstruct()
-    {}
+    {
+        return true;
+    }
 
     public function __construct($id = null, ?namespace\sql $sql = null, $prefix = null, $settings = null)
     {
         # How to call from child template:
         # parent::__construct($id, $sql, $prefix, $settings);
         $this->__settings = $settings;
-        if (empty($this::$sqlSelectTemplate) and ! empty($this::$sqlTable)) {
+        if (empty($this::$sqlSelectTemplate) && ! empty($this::$sqlTable)) {
             $this->__sqlSelectTemplate = "select * from `" . $this::$sqlTable . "` as `i`";
         } else {
             $this->__sqlSelectTemplate = $this::$sqlSelectTemplate;
@@ -442,7 +443,6 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
                     }
                 } else {
                     throw new \Exception("property $key not availiable for read in class " . get_class($this), 595);
-                    break;
                 }
         }
     }
@@ -504,7 +504,7 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
                 if (($this->__get($key)) instanceof \JsonSerializable) {
                     $rv[$key] = $this->__get($key);
                 } elseif (($this->__get($key)) instanceof stringExportable) {
-                    if (($this->__get($key)->isNull())) {
+                    if ($this->__get($key)->isNull()) {
                         $rv[$key] = null;
                     } else {
                         $rv[$key] = (string) ($this->__get($key));
@@ -558,7 +558,7 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
                             break;
                             
                         default:
-                            continue 2;
+                            break;
                     }
                    
                 }
@@ -583,9 +583,10 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
         $sqlQueryString=$ref->sqlSelectTemplate.(empty($join)?"":" ".$join).(empty($where)?"":" WHERE ".$where).(empty($limit)?"":" ".$limit);
         
         $res=$sql->quickExec($sqlQueryString);
-        $rv=[];
+        $rv=new searchResult();
+        $rv->setIndexByPage($page, $pageSize);
         while ($row=mysqli_fetch_assoc($res)) {
-            $rv[]=new static($row);
+            $rv->push(new static($row));
         }
         return $rv;
     }

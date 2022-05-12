@@ -68,7 +68,8 @@ class config extends dbStoredBase
         "FOX_DEFAULT_LANGUAGE",
         "FOX_DEFAULT_MODULE",
         "FOX_SESSION_RENEW_SEC",
-        "FOX_ALLOW_REGISTER"
+        "FOX_ALLOW_REGISTER",
+        "FOX_ENVIRONMENT",
     ];
 
     static function get($key, $module = "core")

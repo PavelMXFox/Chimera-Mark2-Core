@@ -38,7 +38,7 @@ class UID extends baseClass implements stringExportable, stringImportable
 
     public function __get($key)
     {
-        if (! empty($this->id) && $this->__loaded == false) {
+        if (empty($this->id) && $this->__loaded) {
             $this->fill($this->id);
         }
 
@@ -80,8 +80,7 @@ class UID extends baseClass implements stringExportable, stringImportable
         $sum2 = substr($code, 0, 1) + substr($code, 2, 1) + substr($code, 4, 1) + substr($code, 6, 1) + substr($code, 8, 1);
         $sum = $sum1 + $sum2;
         $ceil = ceil(($sum / 10)) * 10;
-        $delta = $ceil - $sum;
-        return $delta;
+        return $ceil - $sum;
     }
 
     public static $sqlTable = "tblRegistry";

@@ -1,4 +1,4 @@
-FROM mxfox.ru/chimera/fox-web-basic:latest AS prepare
+FROM mxfox.ru/mxfox/fox-web-basic:latest AS prepare
 
 RUN apt-get update \
     && apt-get install curl -y \
@@ -31,6 +31,6 @@ RUN rm -f composer.* \
     && rm -rf docker-build
 
 
-FROM mxfox.ru/chimera/fox-web-basic:latest as build
+FROM mxfox.ru/mxfox/fox-web-basic:latest as build
 COPY --from=prepare /var/www/html /var/www/html
 COPY docker-build/rootfs /

@@ -118,7 +118,7 @@ class userInvitation extends baseClass  implements externalCallable {
     }
     
     public static function API_GET_list(request $request) {
-        return static::search();
+        return static::search()->result;
     }
         
     public static function APIX_GET_reSend(request $request) {

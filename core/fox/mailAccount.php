@@ -81,8 +81,8 @@ class mailAccount extends baseClass implements externalCallable {
             case "password": return xcrypt::decrypt($this->__password);
             case "rxLogin": return $this->login;
             case "rxPassword": return xcrypt::decrypt($this->__password);
-            case "rxLogin": return $this->login;
-            case "rxPassword": return xcrypt::decrypt($this->__password);
+            case "txLogin": return $this->login;
+            case "txPassword": return xcrypt::decrypt($this->__password);
             default: return parent::__get($key);
         }
     }
@@ -161,7 +161,7 @@ class mailAccount extends baseClass implements externalCallable {
             throw new foxException("Forbidden", 403);
         }
         
-        return static::search();
+        return static::search()->result;
     }
     
     public static function API_DELETE(request $request) {

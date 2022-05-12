@@ -106,7 +106,7 @@ function moduleInstall_Click(el) {
 	
 	UI.createDialog(
 		UI.addFieldGroup([
-			UI.addField({item: "mod_name", title: langPack.core.iface.title, type: "input", reqx: "true", reqx: "true", regx: "^[A-Za-z0-9_-]*$", val: $(el.target).closest("tr").attr("modName")}),
+			UI.addField({item: "mod_name", title: langPack.core.iface.title, type: "input", reqx: "true", regx: "^[A-Za-z0-9_-]*$", val: $(el.target).closest("tr").attr("modName")}),
 			UI.addField({item: "mod_priority", title: langPack.core.iface.modules.priority, type: "input", reqx: "true", regx: "^[0-9]*$",  val: 100}),
 		]),
 	langPack.core.iface.dialodAddButton, 

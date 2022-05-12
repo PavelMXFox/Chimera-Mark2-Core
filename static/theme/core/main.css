@@ -243,7 +243,6 @@ div.header_user
 	border: 2px solid red;
    background-color: rgba(0, 0, 0, 0.85);
 	
-	margin: 0; 
 	padding: 70px 0 0 0; 
 	position: absolute;
 	left: calc(50% - 250px);
@@ -254,7 +253,9 @@ div.header_user
 	height: 150px;
 	font-family: 'Fira Mono', monospace; 
 	font-weight: 200; 
-	font-size: 32px; color: #FF3500; margin: 1%;
+	font-size: 32px;
+	color: #FF3500; 
+	margin: 1%;
 	z-index: 200;
 }
 
@@ -403,7 +404,6 @@ div.t_navy_main, div.t_main
 {
 	text-align: left;
 	vertical-align: top;
-	padding-top: 0px;
 	padding: 10px 7px 10px 7px;
 }
 
@@ -674,7 +674,7 @@ li.xmenu {
 	margin-left: 14px;
 }
 
-t_navy_main .xmenu p {
+.xmenu p {
 	margin-left: 5px;
 }
 
@@ -1437,7 +1437,6 @@ div.alert, p.alert
     top: 50%;
     margin-left: -350px;
     margin-top: -25px;
-    font-weight: bold;
     vertical-align: middle;
     padding-top: 10px;
     color: white;
@@ -1590,7 +1589,6 @@ div.chevron.first .button
 
 div.login
 {
-	width: 300px;
 	position: absolute;
 	left: 50%;
 	top: 50%;
@@ -1672,7 +1670,7 @@ div.dialog textarea
 
 table.datatable td.code
 {
-	font-family: 'Share Tech Mono';
+	font-family: Share Tech Mono, sans-serif;
 	font-size: 16px;
 	color: rgba(255,255,255,0.8);
 }
@@ -1743,7 +1741,6 @@ div.accordion .ui-accordion-header.ui-state-active {
 
 /* accordion and tabs */
 div.accordion .ui-accordion-header {
-    border-radius: 5px;
     background-color: rgba(var(--mxs-bg-rgba-prefix),0.7);
     font-family: 'Fira Sans Extra Condensed', sans-serif;
     font-weight: normal;

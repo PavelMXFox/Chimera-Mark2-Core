@@ -46,11 +46,6 @@ class errorPage
             exit();
         }
 
-        $mod_name = config::get("defaultLoginModule");
-        if (! $mod_name) {
-            $mod_name = "core";
-        }
-
         static::show($error_code, $error_desc, true);
         exit();
     }

@@ -74,7 +74,7 @@ class confirmCode extends baseClass {
     
     protected function validateSave()
     {
-        if ($this->issueStamp->isNull()) {$this->issueStamp=time::current();};
+        if ($this->issueStamp->isNull()) {$this->issueStamp=time::current();}
         if ($this->expireStamp->isNull()) {$this->expireStamp=time::current()->addSec(static::defaultTTL);}
         if ($this->code==null) { $this->code=(common::genPasswd(4,[0,1,2,3,4,5,6,7,8,9]));}
         if (empty($this->instance) || empty($this->class) || empty($this->operation)  || empty($this->reference)) {

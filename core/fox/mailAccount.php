@@ -177,8 +177,7 @@ class mailAccount extends baseClass implements externalCallable {
         if (! $request->user->checkAccess("adminMailAccounts", "core")) {
             throw new foxException("Forbidden", 403);
         }
-        $m=new static(common::clearInput($request->function,"0-9"));
-        return $m;
+        return new static(common::clearInput($request->function,"0-9"));
     }
     
     public static function APIX_GET_setDefault(request $request) {

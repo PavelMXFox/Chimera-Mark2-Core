@@ -16,44 +16,23 @@ class user extends baseClass implements externalCallable
 {
 
     protected $id;
-
     public $login;
-
     protected UID $invCode;
-
     protected $__secret;
-
     public $authType;
-
     public $authRefId;
-
     public int $offlineAuthCtr = 0;
-
     public $fullName;
-
     protected bool $active = true;
-
     protected bool $deleted = false;
-
-    public string $uiTheme = "default";
-
     public $companyId;
-
     public $eMail;
-
     public bool $eMailConfirmed = false;
-
-    protected array $settings = [
-        "pagesize" => 30
-    ];
-
+    protected array $config = [];
     protected ?company $__company = null;
-
-    
-    protected static $excludeProps = ["settings","authRefId"];
-    
+  
+    protected static $excludeProps = ["authRefId"];
     public static $sqlTable = "tblUsers";
-
     public static $deletedFieldName = "deleted";
 
     public static $sqlColumns = [
@@ -300,6 +279,13 @@ class user extends baseClass implements externalCallable
         return true;
     }
         
+    public function export() {
+        $rv=parent::export();
+        $rv["config"]=(object)$this->config;
+        return $rv;
+    }
+    
+    ### REST API
     public static function API_GET_list(request $request)
     {
         if (! $request->user->checkAccess("adminUsers", "core")) {
@@ -313,7 +299,7 @@ class user extends baseClass implements externalCallable
             throw new foxException("Forbidden", 403);
         }
         $pageSize=common::clearInput($request->requestBody->pageSize,"0-9");
-        if (empty($pageSize)) { $pageSize=$request->user->settings["pageSize"];}
+        if (empty($pageSize)) { $pageSize=$request->user->config["pageSize"];}
         
         return static::search(common::clearInput($request->requestBody->pattern), $pageSize)->result;
         

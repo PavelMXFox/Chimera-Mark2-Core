@@ -41,6 +41,8 @@ class modules implements externalCallable
                 "adminUserGroups"=>"Manage userGroups",
                 "adminMailAccounts"=>"Manage system mail accounts",
                 "adminAuthMethods"=>"Manage auth methods",
+                "viewCompanies"=>"View companies",
+                "adminCompanies"=>"Manage companies",
             ],
             "configKeys"=> [
                 "converterURL"=>"FoxConverter URL prefix",
@@ -79,6 +81,14 @@ class modules implements externalCallable
                             ],
                             "function" => "groups",
                             "pageKey" => "adminGrous"
+                        ],
+                        [
+                            "title" => [
+                                "ru" => "Компании",
+                                "en" => "Companies"
+                            ],
+                            "function" => "comps",
+                            "pageKey" => "adminComps"
                         ],
                         [
                             "title" => [

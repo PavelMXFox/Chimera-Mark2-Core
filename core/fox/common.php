@@ -38,10 +38,8 @@ class common
             } else {
                 $val = "";
             }
-            if ($val == "") {
-                if (isset($_GET[$name])) {
-                    $val = preg_replace('![^' . $regex . ']+!', '', $_GET[$name]);
-                }
+            if ($val == "" && isset($_GET[$name])) {
+                $val = preg_replace('![^' . $regex . ']+!', '', $_GET[$name]);
             }
         } else {
 

@@ -135,6 +135,15 @@ class userGroup extends baseClass implements externalCallable
         $user->flushACRCache();
         return true;
     }
+    
+    public function isMember(user $user) {
+        foreach (userGroupMembership::getUsersInGroup($this, $this->sql) as $ugm) {
+            if ($ugm->user->id == $user->id) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public function addAccessRule(string $rule, string $modInstance = "<all>")
     {

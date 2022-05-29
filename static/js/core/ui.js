@@ -118,18 +118,22 @@ export function empty() {
 */
 
 export function createLeftPanel(panels) {
-	$("<div>", { class: "widget_panel_left" }).appendTo(".t_main #mainframe");
+	let ref=($(".t_main #mainframe div.widget_panel_left"));
+	if (ref.length==0) {
+		ref=$("<div>", { class: "widget_panel_left" }).appendTo(".t_main #mainframe");
+	} else {
+		ref.empty();
+	}
 	
 	var divAccord=$("<div>",{
 		id: "accordion",
 		class: "accordion"
-	}).appendTo(".widget_panel_left");
+	}).appendTo(ref);
 
 
 	$.each(panels,function (index,panel) {
-		
-		let px = $("<h3>",{text: panel.title, append: panel.buttons })
-		.add($("<div>", { class: "widget lock c_contacts", id: "gendesc", text: langPack.core.iface.dataLoading}));
+		let px = $("<h3>",{text: panel.title, id: panel.id+"_title", append: panel.buttons, style: panel.disabled?"display: none":"" })
+		.add($("<div>", { class: "widget lock c_contacts", id: panel.id, text: langPack.core.iface.dataLoading, style: panel.disabled?"display: none":""}));
 		
 		px.appendTo(divAccord);
 	});
@@ -159,13 +163,18 @@ function panelActivate(panel, callback) {
 }
 
 export function createRightPanel(panels) {
-	let ref=$("<div>", { class: "widget_panel_right" }).appendTo(".t_main #mainframe");
+	let ref=($(".t_main #mainframe div.widget_panel_right"));
+	if (ref.length==0) {
+		ref=$("<div>", { class: "widget_panel_right" }).appendTo(".t_main #mainframe");
+	}
 	createTabsPanel(panels,ref);
 }
 
 export function createTabsPanel(panels,ref) {
 	if (ref===undefined) {
 		ref=$(".t_main #mainframe");
+	} else {
+		ref.empty();
 	}
 	
 	var callback={};
@@ -226,6 +235,12 @@ export function createTabsPanel(panels,ref) {
 			panelBeforeActivate(ui.newPanel,callback);
 		}
 	});
+	
+	$.each(panels,function (_index,panel) {
+		if (panel.disabled) {
+			$( "#item_tabs").tabs("disable","#tab-"+panel.id);
+		}
+	});
 }
 
 
@@ -243,10 +258,10 @@ export function addFieldGroup(items)
  *	  }
  */
 
-export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, onChange)
+export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, onChange, onClick, onContextMenu)
 {
 	var item=undefined;
-	if (ref.type === undefined || ref.item===undefined) { 
+	if (ref.type === undefined || (ref.item===undefined && ref.type != "href")) { 
 		var type = 'label'; 
 	} else {
 		var type=ref.type;
@@ -338,7 +353,11 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
     			break;
 
 			case "label":
-				item = $("<span>", {class: "i", html: ref.val});
+				item = $("<span>", {id: ref.item, class: "i", html: ref.val});
+				break;
+
+			case "href":
+				item = $("<a>", {href: ref.href, id: ref.item, class: "i", html: ref.val, click: smartClick});
 				break;
 				
 			case "multiline":
@@ -396,7 +415,10 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
     	if (ref.disabled) { item.attr("disabled","true")}
 	}
 	
-	item.change(function() {$(this).addClass('changed');});
+	item.change(function() {$(this).addClass('changed');})
+	if (ref.attrs && ref.attrs.disabled) {
+		item.attr("disabled",ref.attrs.disabled)
+	}
 	if (typeof(ref.onChange)=='function') {
 		item.change(ref.onChange);
 	}
@@ -422,6 +444,18 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
 				style: ref.fieldstyle
 			}))
 		});
+		
+		if (type=="label") {
+			if (typeof(ref.onClick)=="function") {
+				rv.click(ref.onClick);
+				rv.addClass("clickable");
+				
+			}
+			if (typeof(ref.onContextMenu)=="function") {
+				rv.bind('contextmenu click', ref.onContextMenu);
+				rv.addClass("withContextMenu");
+			}
+		}
 
 		$.each(ref.attrs, function(key, val) {
 			rv.attr(key,val);
@@ -443,7 +477,13 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
 }
 
 export function breadcrumbsUpdate(text) {
-	$("#breadcrumbs_label").text(text);
+	if (typeof(text)=="string") {
+		$("#breadcrumbs_label").text(text);	
+	} else {
+		$("#breadcrumbs_label").empty();
+		$("#breadcrumbs_label").append(text);
+	}
+	
 }
 
 export function breadcrumbsUpdateSuffix(text) {
@@ -885,7 +925,7 @@ export function contextMenuOpen(event, itemsList, title) {
 	$("body").unbind('contextmenu click', contextMenuClose);
 	let selText = getSelectionText();
 	$("div#contextMenu").empty();
-	$("<p>",{class: "title cmTitle",  text: title}).appendTo("div#contextMenu");
+	if (isset(title)) {	$("<p>",{class: "title cmTitle",  text: title}).appendTo("div#contextMenu"); }
 	let items=$("<div>",{class: "items"}).appendTo("div#contextMenu");
 
 	if (isset(selText)) {
@@ -1110,9 +1150,15 @@ Number.prototype.pad = function(size) {
 				href={href: href};
 			}
 			if (href.external==true) {
-				this.click(function() { document.location.href=href.href; return false;});
+				this.click(function() { 
+					if (getSelectionText()) { return; }
+					document.location.href=href.href; return false;
+				});
 			} else { 
-				this.prop("href",href.href).click(xClick);
+				this.prop("href",href.href).click(function(ref) {
+					if (getSelectionText()) { return; }
+					xClick(ref); 
+				});
 			}
 			this.addClass("clickable");
 			$.each(this.find("td"),function(key,val) {
@@ -1122,5 +1168,15 @@ Number.prototype.pad = function(size) {
 				}
 			});				
 			return this;
+		},
+		
+		onEnter: function(callback) {
+			if (typeof(callback)=="function") {
+				this.on('keyup', function (e) {
+					if (e.key === 'Enter' || e.keyCode === 13) {
+						callback(this);
+					}
+				})
+			}
 		} 
  	})})(jQuery)

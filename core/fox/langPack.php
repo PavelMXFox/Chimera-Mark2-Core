@@ -13,7 +13,7 @@ class langPack {
     
     public static function get($key, $lang=null) {
         $ref=explode(".",$key);
-        if (empty($lang)) { $lang = config::get("DEFAULT_LANGUAGE"); };
+        if (empty($lang)) { $lang = config::get("DEFAULT_LANGUAGE"); }
         if (empty($lang)) { $lang = "ru"; }
         
         $mod=moduleInfo::getByInstance($ref[0]);

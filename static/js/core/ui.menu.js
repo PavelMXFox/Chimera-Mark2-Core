@@ -16,10 +16,11 @@ export class foxMenu {
 			href: "logout"
 		};
 		foxMenu.drawMenuNode(items,$("#menu_base_1"));
+		foxMenu.menuClose();
 	}
 	
 	static drawMenuNode(items,ref,deep,lang, xmodkey) {
-		if (lang==undefined) { lang=API.settings.get("language");}
+		if (lang==undefined) { lang=API.session.getLang();}
 		if (deep==undefined) { deep=0; }
 		let xref=$("<ul>")
 		.appendTo(ref);
@@ -27,6 +28,9 @@ export class foxMenu {
 		$.each(items, function(key, val) {
 
 			if (val.xmodkey!=undefined) { xmodkey=val.xmodkey; }
+
+			let aclMatch=(val.accessRule==undefined) || API.session.checkAccess(val.accessRule, xmodkey); 
+			if (!aclMatch) { return; }
 
 			let title=val.title[lang];
 			if (title==undefined) { title=Object.values(val.title).shift();};
@@ -52,9 +56,8 @@ export class foxMenu {
 			.append($("<i>",{ class: "fas fa-minus minus"}))
 			.append(xlabel)
 			)
-			
 			.appendTo(xref)
-			
+						
 			if (deep==0) {
 				yref.addClass("xmenu_root");
 			} else {
@@ -70,20 +73,22 @@ export class foxMenu {
 		
 	}
 	
-	static menuItemClick(ref,noExec) {
-		
-		let xref=$(ref.target).closest("li");
-		let xchilds=xref.children("ul").children("li");
-		let xparents=xref.parents("li");
-		let xroot=xref.parents("li.xmenu_root");
-		
+	static menuClose() {
 		$(".xmenu_dx").hide();
 		
 		$(".xmenu").removeClass("xmenu_open")
 				   .removeClass("xmenu_active")
 				   .removeClass("xmenu_axtree")
 				   .addClass("xmenu_closed");
-	
+		
+	}
+	static menuItemClick(ref,noExec) {
+		
+		let xref=$(ref.target).closest("li");
+		let xchilds=xref.children("ul").children("li");
+		let xparents=xref.parents("li");
+		let xroot=xref.parents("li.xmenu_root");
+		foxMenu.menuClose();	
 		xref.addClass("xmenu_open")
 			.addClass("xmenu_active")
 			.removeClass("xmenu_closed")

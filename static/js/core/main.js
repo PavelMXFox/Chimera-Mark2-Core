@@ -1,11 +1,17 @@
-import * as API from './api.js';
-import * as UI from './ui.js';
+$("#jsNotStartedStub").remove();
+
 import { lpInit } from './langpack.js';
 import { foxMenu } from './ui.menu.js';
 
+
 var popState_Installed=false;
 
-$(document).ready(function() {
+$(document).ready(async function() {
+	let i=0;
+	while (UI ==undefined || API ==undefined) {
+		await new Promise(r => setTimeout(r, 10));
+	}
+	
 	load();	
 });
 
@@ -20,7 +26,7 @@ export function boot(xlite) {
 	if (xlite==undefined) { xlite=false; }
 	if (!xlite) {
 		UI.setTitle(API.settings.get("title"));
-		UI.loadCSS("/static/theme/"+API.settings.get("theme")+"/main.css");
+		UI.loadCSS("/static/theme/"+API.session.getConfigItem("theme")+"/main.css");
 	}
 	UI.contextMenuClose();
 	

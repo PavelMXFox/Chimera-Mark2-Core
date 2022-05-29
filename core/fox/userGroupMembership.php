@@ -135,7 +135,7 @@ class userGroupMembership extends baseClass implements externalCallable
         if (empty($page) || !(is_numeric($page))) {$page=0;}
 
         @$pageSize=common::clearInput($request->requestBody->pageSize);
-        if (empty($pageSize) || !(is_numeric($pageSize))) {$pageSize=$request->user->settings["pageSize"];}
+        if (empty($pageSize) || !(is_numeric($pageSize))) {$pageSize=$request->user->config["pageSize"];}
         
         if (!empty($request->requestBody->userId)) {
             $user = new user($userId=common::clearInput($request->requestBody->userId,"0-9"));    

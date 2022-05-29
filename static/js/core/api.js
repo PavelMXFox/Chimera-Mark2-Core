@@ -40,7 +40,7 @@ export function exec(requestType, method , data, onSuccess,noblank,onError,versi
   		data: JSON.stringify(data),
   		type: requestType,
   		headers: headers,
-		
+		async: ref.async==undefined?true:ref.async,
 		complete: function(data,textStatus,request) {
 			if (data.getResponseHeader('X-Fox-Token-Renew') !=null) {
 				session.updateToken(data.getResponseHeader('X-Fox-Token-Renew'));					
@@ -164,6 +164,19 @@ export class auth {
 }
 
 export class session {
+	static getConfigItem(item) {
+		let user=this.get("user");
+		if (user && user.config && user.config[item]) {
+			return user.config[item];
+		} else {
+			return settings.get(item);	
+		}		
+	}
+	
+	static getLang() {
+		return this.getConfigItem("language");
+	}
+	
 	static close() {
  		localStorage.removeItem("token");
  		localStorage.removeItem("tokenExpire");
@@ -202,6 +215,14 @@ export class session {
 		} else {
 			return session.get("menu");
 		}
+	}
+	static checkAccess(rule, module) {
+		let acls=this.get("acls");
+		if (module==undefined) { module="core"; } 
+		if (acls[module]!=undefined && Object.values(acls[module]).includes(rule)) { return true; }
+		else if (acls["<all>"]!=undefined && acls["<all>"].includes(rule)) { return true; }
+		else if (acls["<all>"]!=undefined && acls["<all>"].includes("isRoot")) { return true; }
+		else { return false; }
 	}
 	
 	static getModInstances() {

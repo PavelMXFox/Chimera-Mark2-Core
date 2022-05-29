@@ -6,8 +6,7 @@ use Exception;
 /**
  * 
  * Class fox\baseClass
- * 
- * @desc baseClass mk 2 class
+ * @desc FOX Base Class
  * @copyright MX STAR LLC 2021
  * @version 4.0.0
  * @author Pavel Dmitriev
@@ -16,6 +15,7 @@ use Exception;
  * @property-read string $sqlSelectTemplate
  *
  **/
+
 
 class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportable
 {
@@ -33,7 +33,7 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
     // id for xConstruct;
 
     # if null - generated automatically
-    public static $sqlSelectTemplate = null;
+    public static $baseSqlSelectTemplate = null;
 
     # primary index field. Default is id
     public static $sqlIdx = "id";
@@ -146,10 +146,10 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
         # How to call from child template:
         # parent::__construct($id, $sql, $prefix, $settings);
         $this->__settings = $settings;
-        if (empty($this::$sqlSelectTemplate) && ! empty($this::$sqlTable)) {
+        if (empty($this::$baseSqlSelectTemplate) && ! empty($this::$sqlTable)) {
             $this->__sqlSelectTemplate = "select * from `" . $this::$sqlTable . "` as `i`";
         } else {
-            $this->__sqlSelectTemplate = $this::$sqlSelectTemplate;
+            $this->__sqlSelectTemplate = $this::$baseSqlSelectTemplate;
         }
 
         if (isset($sql)) {
@@ -208,6 +208,8 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
     protected function fillFromRow($row)
     {
         foreach ($row as $key => $val) {
+
+            
             if (! empty($this->fillPrefix)) {
                 if (! preg_match("/^" . $this->fillPrefix . "/", $key)) {
                     continue;
@@ -218,8 +220,8 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
             if (property_exists($this, $key) || property_exists($this, "__" . $key)) {
                 if (property_exists($this, "__" . $key)) {
                     $key = "__" . $key;
-                }
-
+                }                                
+                
                 if (gettype($this->{$key}) == 'boolean') {
                     $this->{$key} = $val == 1;
                 } elseif ((($this->{$key}) instanceof jsonImportable) || (($this->{$key}) instanceof stringImportable)) {
@@ -237,8 +239,8 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
                     } else {
                         throw new Exception("Invalid type " . gettype($val) . " for " . $key . " in " . get_class($this));
                     }
-                } else {
-                    $this->{$key} = $val;
+                } else {                    
+                    $this->{$key} = $val;                    
                 }
             }
         }
@@ -447,6 +449,16 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
         }
     }
 
+    public static function qGetSql() : sql
+    {
+        return (new static())->getSql();
+    }
+
+    public static function qGetSqlSelectTemplate() : string
+    {
+        return (new static())->__sqlSelectTemplate;
+    }
+    
     public function getSql() : sql
     {
         $this->checkSql();
@@ -553,7 +565,7 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
                             $where.=(empty($where)?"":" OR ")."`$key` like '%".common::clearInput($pattern)."'";
                             break;
                             
-                        case "invCode":
+                        case "invcode":
                             $where.=(empty($where)?"":" OR ")."`$key`='".UID::clear($pattern)."'";
                             break;
                             

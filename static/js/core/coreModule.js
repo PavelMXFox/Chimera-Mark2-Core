@@ -12,6 +12,7 @@ export var menuSelector={
 	"group":"adminGrous",
 	mailAccounts:"mailAccounts",
 	oauth: "oauth",
+	comps: "adminComps"
 };
 
 export function load() {
@@ -68,6 +69,12 @@ export function load() {
 			break;
 		case "oauth":
 			import("./coreOAuthProfiles.js").then(function(mod) {
+				mod.load();
+			})
+			break;
+
+		case "comps":
+			import("./coreComps.js").then(function(mod) {
 				mod.load();
 			})
 			break;

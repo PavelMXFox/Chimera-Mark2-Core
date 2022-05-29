@@ -148,7 +148,7 @@ table.datatable td.icon,
 table.datatable th.icon 
 {
 	width: 20px;
-	font-size: 16px;
+	font-size: 14px;
 	text-align: center;
 	
 }
@@ -919,7 +919,8 @@ table.datatable td
 
 table.datatable.sel tr.clickable,
 table.datatable.selm tbody.clickable,
-table.datatable.selm tr.ss.clickable {
+table.datatable.selm tr.ss.clickable,
+div.crm_entity_field_block.clickable {
 	cursor: pointer;
 }
 
@@ -928,7 +929,8 @@ table.datatable.selm tbody.contextMenu,
 table.datatable.selm tr.ss.contextMenu,
 table.datatable.sel tr.contextMenu a,
 table.datatable.selm tbody.contextMenu a,
-table.datatable.selm tr.ss.contextMenu a {
+table.datatable.selm tr.ss.contextMenu a,
+div.crm_entity_field_block.withContextMenu {
 	cursor: context-menu;
 }
 
@@ -1675,9 +1677,11 @@ table.datatable td.code
 	color: rgba(255,255,255,0.8);
 }
 
-table.datatable th.code
+table.datatable th.code,
+table.datatable td.code
 {
 	min-width: 110px;
+	width: 105px;
 }
 table.datatable td.comment
 {
@@ -2181,11 +2185,6 @@ td.hideable, th.hideable
 {
 	display: none;
 } 
-
-table.datatable th.code
-{
-	min-width: 40px;
-}
 
 td.hideablealt, th.hideablealt
 {

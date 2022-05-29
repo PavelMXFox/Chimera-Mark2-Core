@@ -20,7 +20,7 @@ export async function lpInit () {
 		API = mod;
 	});
 		
-	var lang=API.settings.get("language");
+	var lang=API.session.getLang();
 	console.log("load "+lang+" language...");
 	
 	let modules=[];

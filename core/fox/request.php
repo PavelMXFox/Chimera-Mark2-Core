@@ -173,5 +173,13 @@ class request extends baseClass implements noSqlMigration
         }
         return $__foxRequest;
     }
+    
+    public function blockIfNoAccess(string $rule, string $modInstance=null) {
+        if ($modInstance==null) { $modInstance=$this->instance; }
+        if (! $this->user->checkAccess($rule, $modInstance)) {
+            throw new foxException("Forbidden", 403);
+        }
+    }
+    
 }
 ?>

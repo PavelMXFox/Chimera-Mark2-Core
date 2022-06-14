@@ -284,6 +284,22 @@ class user extends baseClass implements externalCallable
         $rv["config"]=(object)$this->config;
         return $rv;
     }
+    /**
+     * @param array $options - ["groups" - array of userGroup, if set - search will performed only in it]
+     */
+    protected static function xSearch($where, $pattern, ?array $options, sql $sql) {
+        $ruleJoin=null;
+                
+        if ($options["groups"]) {
+            $groups="";
+            foreach ($options["groups"] as $group) {
+                $groups .= (empty($groups)?"":",")."\"".$group->id."\"";
+            }
+            $ruleJoin = " INNER JOIN `tblUserGroupLink` as `l` on `l`.`userId`=`i`.`id` AND `l`.`groupId` in ($groups)";
+        }
+        
+        return ["where"=>$where, "join"=>$ruleJoin, "group"=>"`i`.`id`"];
+    }
     
     ### REST API
     public static function API_GET_list(request $request)
@@ -295,6 +311,28 @@ class user extends baseClass implements externalCallable
     }
     
     public static function API_POST_search(request $request) {
+        
+        $opts=[];
+        if ($request->checkAccess("viewAllUsers") || $request->checkAccess("adminUsers")) {
+            $opts=[];
+        } else if ($request->checkAccess("viewOwnListsUsers")) {
+            $opts = [
+                "groups"=>userGroup::getForUser($request->user,true),
+            ];
+        } else {
+            $rv=new searchResult();
+            $rv->push($request->user);
+            return $rv;
+            
+        }
+        
+        return static::search(
+            $request->getRequestBodyItem("pattern"),
+            $request->getRequestBodyItem("pageSize"),
+            $request->getRequestBodyItem("page"),
+            $opts
+            );
+        
         if (! $request->user->checkAccess("adminUsers", "core")) {
             throw new foxException("Forbidden", 403);
         }

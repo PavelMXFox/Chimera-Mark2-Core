@@ -170,6 +170,19 @@ export function createRightPanel(panels) {
 	createTabsPanel(panels,ref);
 }
 
+export function tabPanelRenameTab(tabId, text) {
+	$("#a-tab-"+tabId).text(text);
+}
+export function tabPanelHideTab(tabId) {
+	$( "#item_tabs").tabs("disable","#tab-"+tabId);
+}
+export function tabPanelShowTab(tabId) {
+	$( "#item_tabs").tabs("enable","#tab-"+tabId);
+}
+export function tabPanelActivateTab(tabId) {
+	$("#item_tabs").tabs({active: Number($("#a-tab-"+tabId).attr("idx"))});
+}
+
 export function createTabsPanel(panels,ref) {
 	if (ref===undefined) {
 		ref=$(".t_main #mainframe");
@@ -200,7 +213,7 @@ export function createTabsPanel(panels,ref) {
 	$.each(panels,function (index,panel) {
 		if (panel.id==undefined) {panel.id=index;}
 
-		$("<li>",{append: $("<a>",{href: "#tab-"+panel.id, id: "a-tab-"+panel.id, text: panel.title})})
+		$("<li>",{append: $("<a>",{href: "#tab-"+panel.id, id: "a-tab-"+panel.id, text: panel.title}).attr("idx",index)})
 		.appendTo("#item_tabs_ul_list");
 		$("<div>", { 
 			id: "tab-"+panel.id, 
@@ -700,6 +713,25 @@ export function copySelText(selText) {
 	} else {
 		return false;
 	}
+}
+
+export function getClipboard(onSuccess, onFail) {
+		console.log(typeof(onFail));
+		console.log(typeof(onSuccess));
+
+	navigator.clipboard.readText().then(text => {
+		console.log('Clipboard content is: ', text);
+		if (typeof(onSuccess)=="function") {
+			onSuccess(text);
+		}
+	})
+	.catch(err => {
+		console.error('Failed to read clipboard contents: ', err);
+		if (typeof(onFail)=="function") {
+			
+			onFail(err);
+		}
+	})
 }
 
 export function getSelectionText() {

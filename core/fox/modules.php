@@ -43,6 +43,10 @@ class modules implements externalCallable
                 "adminAuthMethods"=>"Manage auth methods",
                 "viewCompanies"=>"View companies",
                 "adminCompanies"=>"Manage companies",
+                "viewAllGroups"=>"Search in all groups and lists",
+                "viewAllLists"=>"Search in all lists",
+                "viewAllUsers"=>"Search in all users",
+                "viewOwnListsUsers"=>"Search users only from own lists"
             ],
             "configKeys"=> [
                 "converterURL"=>"FoxConverter URL prefix",

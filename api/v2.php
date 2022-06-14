@@ -54,6 +54,8 @@ try {
     }
     
     ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
+    
     $apiMethod=fox\common::clearInput($request->method,"A-Z");
     $apiFunction=fox\common::clearInput($request->function,"a-zA-Z0-9");
     $apiXFunction=empty($request->parameters[0])?NULL:fox\common::clearInput($request->parameters[0],"a-zA-Z0-9");
@@ -78,6 +80,7 @@ try {
     
 } catch (fox\foxRequestResult $e) {
     ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
     header('HTTP/1.0 '.$e->getCode().' '.$e->getMessage(), true, $e->getCode());
     if ($e->retVal===null) { 
         print json_encode(["status"=>$e->getMessage()]);

@@ -83,6 +83,9 @@ export function load() {
 		})
 	}).appendTo("body");
 	
+	$("<div>",{ class: "poweredByCFOX", text: "Powered by Chimera FOX"})
+	.appendTo("body")
+	
 	let oap=API.settings.get("oauthProfiles");
 	if (oap.length>0) {
 		let oad=$("<div>",{ class: "widget", id: "divAuthWith" });

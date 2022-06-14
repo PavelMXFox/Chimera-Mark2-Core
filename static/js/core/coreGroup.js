@@ -190,7 +190,7 @@ function btnUserpAdd_click() {
 					data: {pattern: request.term, pageSize: 10},
 					onSuccess: function(json) {
 						let rv=[];
-						$.each(json.data,function(key,val) {
+						$.each(json.data.result,function(key,val) {
 							rv.push({id: val.id, value: val.fullName});
 						});
 						response(rv);

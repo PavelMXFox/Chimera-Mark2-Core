@@ -180,6 +180,27 @@ class request extends baseClass implements noSqlMigration
             throw new foxException("Forbidden", 403);
         }
     }
+
+    public function checkAccess(string $rule, string $modInstance=null) {
+        if ($modInstance==null) { $modInstance=$this->instance; }
+        return $this->user->checkAccess($rule, $modInstance);
+    }
+    
+    public function getRequestBodyItem($key) {
+        if ($this->requestBody!=null && property_exists($this->requestBody, $key)) {
+            return $this->requestBody->{$key};
+        } else {
+            return null;
+        }
+    }
+
+    public function getParamItem($key) {
+        if ($this->parameters !=null && array_key_exists($key, $this->parameters)) {
+            return $this->parameters[$key];
+        } else {
+            return null;
+        }
+    }
     
 }
 ?>

@@ -29,6 +29,7 @@ export var langItem={
 		set: "Установить",
 		edit: "Изменить",
 		copy: "Копировать",
+		copyHash: "Копировать указатель",
 		paste: "Вставить",
 		updated: "Обновлен",	
 		reload: "Обновить",	

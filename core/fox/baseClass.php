@@ -147,7 +147,7 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
         # parent::__construct($id, $sql, $prefix, $settings);
         $this->__settings = $settings;
         if (empty($this::$baseSqlSelectTemplate) && ! empty($this::$sqlTable)) {
-            $this->__sqlSelectTemplate = "select * from `" . $this::$sqlTable . "` as `i`";
+            $this->__sqlSelectTemplate = "select `i`.* from `" . $this::$sqlTable . "` as `i`";
         } else {
             $this->__sqlSelectTemplate = $this::$baseSqlSelectTemplate;
         }
@@ -589,10 +589,11 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
         }
         
         $xRes=static::xSearch($where, $pattern, $options, $sql);
-        $where = $xRes["where"];
-        $join=$xRes["join"];
+        $where = array_key_exists("where",$xRes)?$xRes["where"]:"";
+        $join=array_key_exists("join",$xRes)?$xRes["join"]:"";
+        $groupBy=array_key_exists("group",$xRes)?$xRes["group"]:"";
         
-        $sqlQueryString=$ref->sqlSelectTemplate.(empty($join)?"":" ".$join).(empty($where)?"":" WHERE ".$where).(empty($limit)?"":" ".$limit);
+        $sqlQueryString=$ref->sqlSelectTemplate.(empty($join)?"":" ".$join).(empty($where)?"":" WHERE ".$where).(empty($groupBy)?"":" GROUP BY ".$groupBy).(empty($limit)?"":" ".$limit);
         
         $res=$sql->quickExec($sqlQueryString);
         $rv=new searchResult();

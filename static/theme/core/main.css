@@ -42,6 +42,17 @@
 
 .ui-dialog { z-index: 1000 !important ;}
 
+div.poweredByCFOX {
+	position: absolute; 
+	display: block; 
+	bottom: 32px; 
+	text-align: center; 
+	width: 100%; 
+	font-family: 'Jura', sans-serif; 
+	font-size: 16px; 
+	color: #024c68;
+}
+
 ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front {
 	z-index: 1200 !important;
 }

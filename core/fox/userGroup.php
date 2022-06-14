@@ -40,7 +40,8 @@ class userGroup extends baseClass implements externalCallable
     public static $sqlColumns = [
         "name" => [
             "type" => "VARCHAR(255)",
-            "index" => "INDEX"
+            "index" => "INDEX",
+            "search"=>"LIKE",
         ],
         "companyId" => [
             "type" => "INT",
@@ -87,22 +88,18 @@ class userGroup extends baseClass implements externalCallable
      *  
      */
     protected static function xSearch($where, $pattern, ?array $options, sql $sql) {
-        $accessRule=(empty($options["accessRule"])?null:$options["accessRule"]);
         $isList=(array_key_exists("isList", $options)?$options["isList"]:false);
         $ruleJoin=null;
-        $ruleWhere=null;
-        
+
         if ($isList !== false) {
-            $ruleWhere .= " and `i`.`isList` = " . ($isList == true ? 1 : 0);
+            $where = (empty($where)?"":"( $where ) and ")."`i`.`isList` = " . ($isList == true ? 1 : 0);
         }
         
-        if (empty($ruleWhere)) {
-            $xWhere=$where;
-        } else {
-            $xWhere=(empty($where)?$ruleWhere:"(".$where.") AND ".$ruleWhere);
+        if ($options["user"]) {
+            $ruleJoin = " INNER JOIN `tblUserGroupLink` as `l` on `l`.`groupId`=`i`.`id` AND `l`.`userId`='".$options["user"]->id."'";
         }
-        
-        return ["where"=>$xWhere, "join"=>$ruleJoin];
+
+        return ["where"=>$where, "join"=>$ruleJoin];
     }
     
     public function join(user $user)
@@ -165,6 +162,36 @@ class userGroup extends baseClass implements externalCallable
             }
             ;
         }
+    }
+    
+    ### REST API
+    
+    public static function API_POST_search(request $request) {
+        
+        $opts=[];
+        if ($request->checkAccess("viewAllGroups")) {
+            $opts=[
+                "user"=>$request->getRequestBodyItem("own",true)?$request->user:null,
+                "isList"=>$request->getRequestBodyItem("type")=="list",
+            ];
+        } else if ($request->checkAccess("viewAllLists")) {
+            $opts = [
+                "user"=>$request->getRequestBodyItem("own",true)?$request->user:null,
+                "isList"=>true,
+            ];
+        } else {
+            $opts = [
+                "user"=>$request->user,
+                "isList"=>true,
+            ];
+            
+        }
+        return static::search(
+            $request->getRequestBodyItem("pattern"),
+            $request->getRequestBodyItem("pageSize"),
+            $request->getRequestBodyItem("page"),
+            $opts
+            );
     }
     
     public static function API_GET_list(request $request)

@@ -442,7 +442,13 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
 		title.append($("<span>",{ class: "dialogFieldTitle_Reqx",text: "*", title: langPack.core.iface.errReqx }));
 	}	
 	
-	var rv=$("<div>",{
+	let rvv=$("<div>",{
+				class: "crm_entity_field_value",
+				append: item,
+				style: ref.fieldstyle
+			});
+			
+	let rv=$("<div>",{
 			class: "crm_entity_field_block",
 			style: ref.blockstyle,
 			append: $("<div>",{
@@ -451,11 +457,7 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
 				append: title
 		
 			})
-			.add($("<div>",{
-				class: "crm_entity_field_value",
-				append: item,
-				style: ref.fieldstyle
-			}))
+			.add(rvv)
 		});
 		
 		if (type=="label") {
@@ -464,9 +466,13 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
 				rv.addClass("clickable");
 				
 			}
+		}
+		
+		if (type=="label" || type=="href") {
 			if (typeof(ref.onContextMenu)=="function") {
-				rv.bind('contextmenu click', ref.onContextMenu);
+				rv.bind('contextmenu', ref.onContextMenu);
 				rv.addClass("withContextMenu");
+				rvv.append($("<i>",{style: "padding: 0 10px 0 10px; float: right;", class: "fas fa-ellipsis-v"}).bind('contextmenu click', ref.onContextMenu))
 			}
 		}
 

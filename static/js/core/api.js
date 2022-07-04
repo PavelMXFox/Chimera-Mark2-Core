@@ -1,6 +1,12 @@
 import * as UI from './ui.js';
 import { langPack } from './langpack.js';
 
+export function loadModule(modPath) {
+	import(modPath).then(function(mod) {
+		mod.load();
+	})
+}
+
 // errDict
 export function exec(requestType, method , data, onSuccess,noblank,onError,version)
 {

@@ -25,7 +25,7 @@ class s3client implements objectStorageClient
 
     protected string $prefix = "";
 
-    protected \Aws\S3\S3Client $s3;
+    protected ?\Aws\S3\S3Client $s3;
 
     public function __construct($endpoint = null, $accessKey = null, $secretKey = null, $regionId = null, $prefix = null)
     {
@@ -78,6 +78,7 @@ class s3client implements objectStorageClient
             "Key" => $key,
             "Body" => $data
         ]);
+        gc_collect_cycles();
     }
 
     public function deleteObject($bucket, $key)
@@ -88,13 +89,34 @@ class s3client implements objectStorageClient
         ]);
     }
 
-    public function listObjects($bucket)
+    public function listObjects($bucket, $marker=0)
     {
         return $this->s3->listObjects([
-            "Bucket" => $this->prefix . $bucket
+            "Bucket" => $this->prefix . $bucket,
+            "Marker"=>$marker
         ])["Contents"];
     }
 
+    public function listAllObjects($bucket)
+    {
+        $rv=[];
+        $cnt=0;
+        $marker=null;
+        while(true) {
+            $cx=0;
+            $list = $this->listObjects($bucket,$marker);
+            if ($list==null) { break; }
+            foreach ($list as $key=>$obj) {
+                $cnt++;
+                $cx++;
+                $rv[]=$obj;
+                $marker=$obj["Key"];
+            }
+            if ($cx==0) { break; }
+        }
+        return $rv;
+    }
+    
     public function exec($method, $args = [])
     {
         return $this->s3->{$method}($args);
@@ -112,6 +134,10 @@ class s3client implements objectStorageClient
         return $this->s3->deleteBucket([
             "Bucket" => $this->prefix . $bucket
         ]);
+    }
+    
+    public function __destruct() {
+        $this->s3=null;
     }
 }
 

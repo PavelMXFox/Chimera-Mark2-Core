@@ -97,7 +97,21 @@ async function compEdit_Click(el) {
 		
 	buttons[langPack.core.iface.dialodCloseButton]=function() { UI.closeDialog('ItemAdd'); }
 	
-	UI.createDialog(
+	compAddEditDialog_Create(langPack.core.iface.edit, buttons);
+		
+	await API.exec("GET",UI.parceURL().module+"/company/"+id,{}, function onAjaxSuccess(json,_textStatus) {
+		$("#cao_name").val(json.data.name);
+		$("#cao_qName").val(json.data.qName);
+		$("#cao_description").val(json.data.description);
+		$("#cao_type").val(json.data.type);
+		
+	});
+
+	UI.openDialog('ItemAdd');
+}
+
+function compAddEditDialog_Create(title, buttons) {
+		UI.createDialog(
 		UI.addFieldGroup([
 			UI.addField({title: langPack.core.iface.title, item: "cao_name", type: "input",reqx: true}),
 			UI.addField({title: langPack.core.iface.comps.qName, item: "cao_qName", type: "input",reqx: true}),
@@ -110,22 +124,11 @@ async function compEdit_Click(el) {
 				{val:"parner",title: langPack.core.iface.comps.partner},
 			]}),
 		]),
-		langPack.core.iface.edit, 
+		title, 
 		buttons,
 		350,1,'ItemAdd'
 	);
-	
-	await API.exec("GET",UI.parceURL().module+"/company/"+id,{}, function onAjaxSuccess(json,_textStatus) {
-		$("#cao_name").val(json.data.name);
-		$("#cao_qName").val(json.data.qName);
-		$("#cao_description").val(json.data.description);
-		$("#cao_type").val(json.data.type);
-		
-	});
-
-	UI.openDialog('ItemAdd');
 }
-
 function btnCmpAdd_Click(ref) {
 	var buttons={};
 	buttons[langPack.core.iface.dialodAddButton]=function() {
@@ -145,23 +148,7 @@ function btnCmpAdd_Click(ref) {
 		
 	buttons[langPack.core.iface.dialodCloseButton]=function() { UI.closeDialog('ItemAdd'); }
 	
-	UI.createDialog(
-		UI.addFieldGroup([
-			UI.addField({title: langPack.core.iface.title, item: "cao_name", type: "input",reqx: true}),
-			UI.addField({title: langPack.core.iface.comps.qName, item: "cao_qName", type: "input",reqx: true}),
-			UI.addField({title: langPack.core.iface.desc, item: "cao_description", type: "input"}),
-			UI.addField({title: langPack.core.iface.type, item: "cao_type", type: "select", reqx: true,  args: [
-				{val:"",title: ""},
-				{val:"company",title: langPack.core.iface.comps.company},
-				{val:"client",title: langPack.core.iface.comps.client},
-				{val:"supplier",title: langPack.core.iface.comps.supplier},
-				{val:"parner",title: langPack.core.iface.comps.partner},
-			]}),
-		]),
-		langPack.core.iface.add, 
-		buttons,
-		350,1,'ItemAdd'
-	);
+	compAddEditDialog_Create(langPack.core.iface.add, buttons);
 		
 	UI.openDialog('ItemAdd');
 }

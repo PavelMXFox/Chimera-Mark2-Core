@@ -214,7 +214,7 @@ div.header_user
 	width: 100%; 
 	height: 100%; 
 	position: fixed;
-	z-index: 200;
+	z-index: 2000;
 	top: 0;
     left: 0;
 	backdrop-filter: blur(1px);
@@ -941,7 +941,8 @@ table.datatable.selm tr.ss.contextMenu,
 table.datatable.sel tr.contextMenu a,
 table.datatable.selm tbody.contextMenu a,
 table.datatable.selm tr.ss.contextMenu a,
-div.crm_entity_field_block.withContextMenu {
+div.crm_entity_field_block.withContextMenu, 
+div.crm_entity_field_block.withContextMenu a {
 	cursor: context-menu;
 }
 

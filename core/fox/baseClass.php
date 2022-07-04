@@ -581,6 +581,9 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
             $where = (empty($where)?"":"(".$where.") AND ")."`".static::$deletedFieldName."` = 0";
         }
         
+        $pageSize=is_numeric($pageSize)?((int)$pageSize):null;
+        $page=is_numeric($page)?((int)$page):null;
+        
         if ($pageSize!==null) {
             if ($page<1) { $page=1;}
             $limit = "LIMIT ".($pageSize*($page-1)).", ".$pageSize;

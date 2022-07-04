@@ -332,15 +332,7 @@ class user extends baseClass implements externalCallable
             $request->getRequestBodyItem("page"),
             $opts
             );
-        
-        if (! $request->user->checkAccess("adminUsers", "core")) {
-            throw new foxException("Forbidden", 403);
-        }
-        $pageSize=common::clearInput($request->requestBody->pageSize,"0-9");
-        if (empty($pageSize)) { $pageSize=$request->user->config["pageSize"];}
-        
-        return static::search(common::clearInput($request->requestBody->pattern), $pageSize)->result;
-        
+     
     }
     
     public static function APIX_GET_sendEMailConfirmation(request $request) {

@@ -1,7 +1,7 @@
 <?php 
 namespace fox;
 class searchResult {
-    public $page=0;
+    public $page=1;
     public $pages=0;
     public $result=[];
     public $count=0;

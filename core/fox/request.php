@@ -57,6 +57,7 @@ class request extends baseClass implements noSqlMigration
 
     function parce()
     {
+        global $__foxRequestInstance;
         $this->method = (empty($_SERVER["REQUEST_METHOD"]) ? "GET" : $_SERVER["REQUEST_METHOD"]);
         if (array_key_exists("FOX_REWRITE", $_SERVER) && $_SERVER["FOX_REWRITE"] != "yes") {
             $prefix = ($_SERVER["CONTEXT_PREFIX"] . "index.php/");
@@ -89,6 +90,7 @@ class request extends baseClass implements noSqlMigration
 
         $this->module = ((count($req) > 0) ? $req[0] : NULL);
         $this->instance=$this->module;
+        $__foxRequestInstance=$this->instance;
         $this->function = ((count($req) > 1) ? $req[1] : NULL);
 
         if (count($req) > 2) {
@@ -146,8 +148,10 @@ class request extends baseClass implements noSqlMigration
 
     function shift()
     {
+        global $__foxRequestInstance;
         $this->instance=$this->module;
         $this->module = $this->function;
+        $__foxRequestInstance=$this->instance;
         $this->function = array_shift($this->parameters);
         return $this;
     }

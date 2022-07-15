@@ -13,6 +13,7 @@ use Exception;
  * @license GPLv3
  * @property-read mixed $changelog
  * @property-read string $sqlSelectTemplate
+ * @property-read string $sqlCountSelectTemplate
  *
  **/
 
@@ -35,6 +36,9 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
     # if null - generated automatically
     public static $baseSqlSelectTemplate = null;
 
+    # if null - generated automatically
+    public static $baseSqlCountSelectTemplate = null;
+    
     # primary index field. Default is id
     public static $sqlIdx = "id";
     
@@ -45,12 +49,14 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
     public static $deletedFieldName = null;
 
     protected $__sqlSelectTemplate = null;
-
+    protected $__sqlCountSelectTemplate = null;
+    
     # basic exclude props
     protected static $excludePropsBase = [
         'sql',
         'changelog',
         '__sqlSelectTemplate',
+        '__sqlCountSelectTemplate',
         'fillPrefix'
     ];
 
@@ -152,6 +158,12 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
             $this->__sqlSelectTemplate = $this::$baseSqlSelectTemplate;
         }
 
+        if (empty($this::$baseSqlCountSelectTemplate) && ! empty($this::$sqlTable)) {
+            $this->__sqlCountSelectTemplate = "select count(".static::$sqlIdx.") as `count` from `" . $this::$sqlTable . "` as `i`";
+        } else {
+            $this->__sqlCountSelectTemplate = $this::$baseSqlCountSelectTemplate;
+        }
+        
         if (isset($sql)) {
             $this->sql = &$sql;
         }
@@ -430,6 +442,9 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
             case "sqlSelectTemplate":
                 return $this->__sqlSelectTemplate;
                 break;
+            case "sqlCountSelectTemplate":
+                return $this->__sqlCountSelectTemplate;
+                break;
             case "sql":
                 $this->checkSql();
                 return $this->sql;
@@ -545,6 +560,15 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
         if (static::$sqlTable == null) {
             throw new \Exception("Search not implemented for ".static::class);
         }
+        
+        if ($pattern instanceof request) {
+            @$page=$pattern->requestBody->page;
+            @$pageSize=$pattern->requestBody->pageSize;
+            $options=(array)$pattern->requestBody;
+            
+            @$pattern=$pattern->requestBody->pattern;
+        }
+        
         $ref=new static();
         $sql = $ref->getSql();
         
@@ -580,9 +604,35 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
         if (static::$deletedFieldName && empty($options["showDeleted"])) {
             $where = (empty($where)?"":"(".$where.") AND ")."`".static::$deletedFieldName."` = 0";
         }
+                
+        $xRes=static::xSearch($where, $pattern, $options, $sql);
+        $where = array_key_exists("where",$xRes)?$xRes["where"]:"";
+        $join=array_key_exists("join",$xRes)?$xRes["join"]:"";
+        $groupBy=array_key_exists("group",$xRes)?$xRes["group"]:"";
+        $orderBy=array_key_exists("order",$xRes)?$xRes["order"]:"";
+        
+        if (empty($orderBy) && array_key_exists("orderBy", $options)) {
+            @$orderDesc=strtoupper($options["orderDir"])=="DESC"?"DESC":"ASC";
+            $orderBy=common::clearInput($options["orderBy"])." ".$orderDesc;
+        }
+        
+        $sqlQueryStringCount=$ref->sqlCountSelectTemplate.(empty($join)?"":" ".$join).(empty($where)?"":" WHERE ".$where).(empty($groupBy)?"":" GROUP BY ".$groupBy);
+        
+        $rv=new searchResult();
         
         $pageSize=is_numeric($pageSize)?((int)$pageSize):null;
-        $page=is_numeric($page)?((int)$page):null;
+        $page=is_numeric($page)?((int)$page):1;
+        if ($pageSize) {
+            $rc=$sql->quickExec1Line($sqlQueryStringCount);
+            $rv->pages=ceil($rc["count"]/$pageSize);
+        } else {
+            $page=1;
+            $rv->pages=1;
+            
+        }
+        
+        if ($rv->pages < $page) { $page=$rv->pages; }
+        $rv->page=$page;
         
         if ($pageSize!==null) {
             if ($page<1) { $page=1;}
@@ -591,15 +641,9 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
             $limit="";
         }
         
-        $xRes=static::xSearch($where, $pattern, $options, $sql);
-        $where = array_key_exists("where",$xRes)?$xRes["where"]:"";
-        $join=array_key_exists("join",$xRes)?$xRes["join"]:"";
-        $groupBy=array_key_exists("group",$xRes)?$xRes["group"]:"";
-        
-        $sqlQueryString=$ref->sqlSelectTemplate.(empty($join)?"":" ".$join).(empty($where)?"":" WHERE ".$where).(empty($groupBy)?"":" GROUP BY ".$groupBy).(empty($limit)?"":" ".$limit);
+        $sqlQueryString=$ref->sqlSelectTemplate.(empty($join)?"":" ".$join).(empty($where)?"":" WHERE ".$where).(empty($orderBy)?"":" ORDER BY ".$orderBy).(empty($groupBy)?"":" GROUP BY ".$groupBy).(empty($limit)?"":" ".$limit);
         
         $res=$sql->quickExec($sqlQueryString);
-        $rv=new searchResult();
         $rv->setIndexByPage($page, $pageSize);
         while ($row=mysqli_fetch_assoc($res)) {
             $rv->push(new static($row));

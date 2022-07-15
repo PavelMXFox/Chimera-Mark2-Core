@@ -164,6 +164,16 @@ table.datatable th.icon
 	
 }
 
+div.foxPagerMain i {
+	margin-left: 4px;
+	margin-right: 4px;
+}
+
+div.foxPagerMain span.foxPager_label {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
 div.header
 {
 	margin: 0px;
@@ -1718,7 +1728,8 @@ td.hideablealt, th.hideablealt
 	display: none;
 } 
 
-div.widget_panel_left div.accordion div.widget {
+/* div.widget_panel_left */ 
+div.accordion div.widget {
     padding: 10px 0 10px 0;
     height: auto;
     margin-top: 5px;

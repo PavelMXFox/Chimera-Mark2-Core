@@ -117,8 +117,18 @@ export function empty() {
 
 */
 
-export function createLeftPanel(panels) {
-	let ref=($(".t_main #mainframe div.widget_panel_left"));
+export function createLeftPanel(panels, config) {
+	
+	if (config==undefined) { config={};}
+	
+	
+	let ref;
+	if (config.ref) {
+		ref=config.ref;
+	} else {
+		if (!ref) { ref =$(".t_main #mainframe div.widget_panel_left"); }
+	}
+	
 	if (ref.length==0) {
 		ref=$("<div>", { class: "widget_panel_left" }).appendTo(".t_main #mainframe");
 	} else {
@@ -131,18 +141,37 @@ export function createLeftPanel(panels) {
 	}).appendTo(ref);
 
 
-	$.each(panels,function (index,panel) {
-		let px = $("<h3>",{text: panel.title, id: panel.id+"_title", append: panel.buttons, style: panel.disabled?"display: none":"" })
-		.add($("<div>", { class: "widget lock c_contacts", id: panel.id, text: langPack.core.iface.dataLoading, style: panel.disabled?"display: none":""}));
+	$.each(panels,function (_index,panel) {
+		let xpdiv=$("<div>", { class: "widget lock c_contacts", id: panel.id, text: langPack.core.iface.dataLoading, style: panel.disabled?"display: none":""});
+		if (panel.attrs) {
+			$.each(panel.attrs, function (key, val) {
+			xpdiv.attr(key,val);				
+			});
+		}
 		
+		let px = $("<h3>",{text: panel.title, id: panel.id+"_title", append: panel.buttons, style: panel.disabled?"display: none":"" })
+		.add(xpdiv);
 		px.appendTo(divAccord);
 	});
+	
+	let accConfig={
+		heightStyle: "content",
+	};
+	if (typeof(config.beforeActivate)=="function") {
+		accConfig.beforeActivate=config.beforeActivate;
+	}
 
-	$( "#accordion" ).accordion({
-			heightStyle: "content",
-			activate: function( event, ui) {
-		}
-	});
+	if (typeof(config.activate)=="function") {
+		accConfig.activate=config.activate;
+	}
+
+	if (typeof(config.create)=="function") {
+		accConfig.create=config.create;
+	}
+
+
+	$("#accordion" ).accordion(accConfig);
+
 }
 
 function panelBeforeActivate(panel, callback) {
@@ -518,9 +547,23 @@ export function date2stamp(dateString) {
 	return (new Date(dateString).getTime()/1000);
 }
 
+export function stamp2isodateq(stamp) {
+	var xdate = new Date(stamp*1000);
+	var rv=xdate.getFullYear().pad(4)+"-"+String((xdate.getMonth()+1).pad(2))+"-"+String(xdate.getDate().pad(2));
+	return rv;
+}
+
+
+export function stamp2isodatens(stamp) {
+	var xdate = new Date(stamp*1000);
+	var rv=stamp2isodateq(stamp)+" "+xdate.getHours().pad(2)+":"+xdate.getMinutes().pad(2);
+	return rv;
+}
+
+
 export function stamp2isodate(stamp) {
 	var xdate = new Date(stamp*1000);
-	var rv=xdate.getFullYear().pad(4)+"-"+String((xdate.getMonth()+1).pad(2))+"-"+String(xdate.getDate().pad(2))+" "+xdate.getHours().pad(2)+":"+xdate.getMinutes().pad(2)+":"+xdate.getSeconds().pad(2);
+	var rv=stamp2isodatens(stamp)+":"+xdate.getSeconds().pad(2);
 	return rv;
 }
 
@@ -1108,6 +1151,7 @@ Number.prototype.pad = function(size) {
 						$(ref).empty();
 						$(ref).prop('foxPager_prefix', options.prefix);
 						$(ref).addClass('foxPager_'+options.prefix);
+						$(ref).addClass('foxPagerMain');
 						
 						$("<i>",{class: "fas fa-angle-double-left", css: {	padding: "0 10 0 10", cursor: 'hand' }}).click(function() {
 							options.page = parseInt($(ref).prop('foxPager_page'));
@@ -1118,7 +1162,7 @@ Number.prototype.pad = function(size) {
 								sessionStorage.setItem(options.prefix+"pager", options.page);
 								$(".foxPager_"+options.prefix).find(".foxPager_label").text("Стр: "+options.page+" из "+options.pages);
 								$(".foxPager_"+options.prefix).prop('foxPager_page', options.page);
-								options.callback();
+								options.callback({prefix: options.prefix, page: options.page});
 							}
 						})
 						.appendTo(ref);
@@ -1132,7 +1176,7 @@ Number.prototype.pad = function(size) {
 								sessionStorage.setItem(options.prefix+"pager", options.page);
 								$(".foxPager_"+options.prefix).find(".foxPager_label").text("Стр: "+options.page+" из "+options.pages);
 								$(".foxPager_"+options.prefix).prop('foxPager_page', options.page);
-								options.callback();
+								options.callback({prefix: options.prefix, page: options.page});
 							}
 						}).appendTo(ref);
 						
@@ -1148,7 +1192,7 @@ Number.prototype.pad = function(size) {
 								sessionStorage.setItem(options.prefix+"pager", options.page);
 								$(".foxPager_"+options.prefix).find(".foxPager_label").text("Стр: "+options.page+" из "+options.pages);
 								$(".foxPager_"+options.prefix).prop('foxPager_page', options.page);
-								options.callback();
+								options.callback({prefix: options.prefix, page: options.page});
 							}
 						}).appendTo(ref);
 						$("<i>",{class: "fas fa-angle-double-right", css: { padding: "0 10 0 10", cursor: 'hand'	} }).click(function() {
@@ -1161,7 +1205,7 @@ Number.prototype.pad = function(size) {
 								sessionStorage.setItem(options.prefix+"pager", options.page);
 								$(".foxPager_"+options.prefix).find(".foxPager_label").text("Стр: "+options.page+" из "+options.pages);
 								$(".foxPager_"+options.prefix).prop('foxPager_page', options.page);
-								options.callback();
+								options.callback({prefix: options.prefix, page: options.page});
 							}
 						}).appendTo(ref);
 						

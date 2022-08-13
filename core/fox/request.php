@@ -12,6 +12,7 @@ namespace fox;
  *        
  * @property-read user $user
  * @property-read $userId
+ * @property-read $rawRequestBody
  *               
  */
 class request extends baseClass implements noSqlMigration
@@ -164,6 +165,8 @@ class request extends baseClass implements noSqlMigration
                     throw new foxException('Unauthorized', 401);
                 }
                 return $this->token->user;
+            case "rawRequestBody":
+                return file_get_contents("php://input");
             default:
                 return parent::__get($key);
         }

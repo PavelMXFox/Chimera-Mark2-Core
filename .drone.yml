@@ -1,0 +1,111 @@
+---
+kind: pipeline
+name: SonarQube check
+
+image_pull_secrets:
+ - dockerconfig
+
+trigger:
+  branch:
+  - develop
+  event:
+  - push
+  - custom
+
+steps:
+ - name: SonarQube check
+   image: sonarsource/sonar-scanner-cli
+   environment:
+     SONAR_PROJECT:
+       from_secret: sonarProjectId
+     SONAR_TOKEN:
+       from_secret: sonarToken
+     SONAR_HOST:
+       from_secret: sonarHost
+     TEST: test
+
+   commands:
+     - sonar-scanner -Dsonar.projectKey=$${SONAR_PROJECT} -Dsonar.sources=. -Dsonar.host.url=$${SONAR_HOST}   -Dsonar.login=$${SONAR_TOKEN}
+   depends_on:
+     - clone
+
+---
+kind: pipeline
+name: Build image
+
+image_pull_secrets:
+ - dockerconfig
+
+trigger:
+  ref:
+    - refs/heads/testing
+    - refs/heads/master
+    - refs/tags/*
+
+steps:
+ - name: Prepare image
+   image: mxfox.ru/mxfox/fox-web-basic:latest
+   commands:
+     - |
+        apt-get update -y
+        apt-get install curl -y
+        cd /tmp
+        curl -sS https://getcomposer.org/installer -o composer-setup.php
+        php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+        DEBIAN_FRONTEND=noninteractive TZ=Europe/Moscow apt-get -y install tzdata
+        cd -
+     - composer install 
+     - |
+        find . -name "*~"  		-prune -exec rm -rf '{}' \; 
+        find . -name "*.bak" 	-prune -exec rm -rf '{}' \; 
+        find . -name "*.old" 	-prune -exec rm -rf '{}' \;
+        find . -name ".git" 	-prune -exec rm -rf '{}' \;
+        find . -name ".settings"	-prune -exec rm -rf '{}' \;
+        find . -name ".buildpath" 	-prune -exec rm -rf '{}' \;
+        find . -name ".project" 	-prune -exec rm -rf '{}' \;
+        find . -name "README.*" 	-prune -exec rm -rf '{}' \;
+        find . -name "*.md" 	-prune -exec rm -rf '{}' \;
+        find . -name "composer.*" 	-prune -exec rm -rf '{}' \;
+        find . -name ".travis*" 	-prune -exec rm -rf '{}' \;
+        find . -name "installed.json" -prune -exec rm -rf '{}' \;
+        find . -name "*.sample" -prune -exec rm -rf '{}' \;
+        find . -type d ! -path './.git/**' ! -path './static/**' ! -path "./static" ! -path ./*/modules/*/static*  -exec bash -c 'test -f {}/.htaccess && echo -n "[ SKIP ] " || (cp ./docker-build/.htaccess {} && echo -n "[  ADD ] ") && echo {}/.htaccess' \;
+        cp docker-build/Dockerfile Dockerfile
+        rm -f composer.*   
+
+ - name: Build docker image
+   image: mxfox.ru/mxfox/docker-dind.buildx:latest
+   privileged: true
+   environment:
+     DOCKER_AUTH:
+       from_secret: dockerconfig
+     IMAGE_PREFIX: mxfox.ru/mxfox/chimera-mk2-core
+     
+   commands:   
+   - buildx-bgstart.sh
+   - echo $${DOCKER_AUTH} > ~/.docker/config.json
+   - echo "CB ${CI_COMMIT_BRANCH}"
+   - echo "DT ${DRONE_TAG}"
+   - |
+       if [ -n "${DRONE_TAG}" ]
+       then
+          export xBuildSuffix=" -t $${IMAGE_PREFIX}:${DRONE_TAG} -t $${IMAGE_PREFIX}:latest --push"
+       else
+          export xBuildSuffix=" -t $${IMAGE_PREFIX}:${CI_COMMIT_BRANCH}-${CI_BUILD_NUMBER}-${DRONE_COMMIT_SHA:0:10}  -t $${IMAGE_PREFIX}:${CI_COMMIT_BRANCH} --push"
+       fi
+
+   - docker buildx build --platform linux/amd64,linux/arm64 . $${xBuildSuffix}   
+
+---
+kind: pipeline
+name: Export code
+image_pull_secrets:
+ - dockerconfig
+trigger:
+  ref:
+    - refs/tags/*
+steps:
+ - name: Export code
+   image: mxfox.ru/mxfox/fox-web-basic:latest
+   commands:
+     - echo "Not implemented yet"     

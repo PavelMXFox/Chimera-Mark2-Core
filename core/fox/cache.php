@@ -14,6 +14,8 @@ namespace fox;
 class cache
 {
 
+    protected const chunkSize=1024000;
+    
     public ?\Memcached $mcd = null;
 
     protected $prefix = null;
@@ -84,9 +86,26 @@ class cache
             return false;
         }
         if ($encrypt) {
-            $this->mcd->set($this->prefix . "." . $key, xcrypt::encrypt(json_encode($val)), $TTL);
+            $str=xcrypt::encrypt(json_encode($val));
         } else {
-            $this->mcd->set($this->prefix . "." . $key, json_encode($val), $TTL);
+            $str=json_encode($val);
+        }
+        
+        $this->del($key);
+        
+        $len=strlen($str);
+        if ($len <= static::chunkSize) {
+            $this->mcd->set($this->prefix . "." . $key, $str, $TTL);
+        } else {
+            # multipart
+            $md5=md5($str);
+            $chunks=ceil($len/static::chunkSize);
+            
+            $this->mcd->set($this->prefix . "." . $key.".MPX00", json_encode(["len"=>$len, "md5"=>$md5,"chunks"=>$chunks]), $TTL);
+            for ($i = 0; $i<$chunks; $i++) {
+                $xzval=substr($str,$i*static::chunkSize,static::chunkSize);
+                $this->mcd->set($this->prefix . "." . $key.".MPX0".($i+1), $xzval, $TTL);                
+            }
         }
     }
 
@@ -101,10 +120,31 @@ class cache
         
         
         $xval=$this->mcd->get($this->prefix . "." . $key);
+        if ($xval==null) {
+            $idx=$this->mcd->get($this->prefix . "." . $key.".MPX00");
+            if ($idx) { 
+                $idx=json_decode($idx);
+                if ($idx) {
+                    $xval="";
+                    for ($i=1; $i <=$idx->chunks; $i++) {
+                        $xzval=$this->mcd->get($this->prefix . "." . $key.".MPX0".$i);
+                        $xval .= $xzval;
+                    }
+                    $xlen=strlen($xval);
+                    $xmd5=md5($xval);
+                    
+                    if ($xlen!=$idx->len || $xmd5!=$idx->md5) {
+                        $this->del($key);
+                        $xval=null;
+                    }
+                }
+            }
+        }
         if ($xval==null || $xval=="null") { return null; }
-        $rv= json_decode($this->mcd->get($this->prefix . "." . $key), $array);
+        
+        $rv= json_decode($xval, $array);
         if ($rv !== null) { return $rv; }
-        return json_decode(xcrypt::decrypt($this->mcd->get($this->prefix . "." . $key)), $array);
+        return json_decode(xcrypt::decrypt($xval), $array);
     }
     
     public function del($key) {
@@ -116,6 +156,17 @@ class cache
         }
 
         $this->mcd->delete($this->prefix . "." . $key);
+        
+        $idx=$this->mcd->get($this->prefix . "." . $key.".MPX00");
+        if ($idx) {
+            $idx=json_decode($idx);
+            if ($idx) {
+                $this->mcd->delete($this->prefix . "." . $key.".MPX00");
+                for ($i=1; $i <=$idx->chunks; $i++) {
+                    $this->mcd->delete($this->prefix . "." . $key.".MPX0".$i);
+                }
+            }
+        }
             
     }
 }

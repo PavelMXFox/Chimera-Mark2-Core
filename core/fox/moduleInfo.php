@@ -33,6 +33,8 @@ class moduleInfo extends baseClass implements externalCallable
 
     public string $modVersion = "1.0.0";
 
+    public ?string $modBuild=null;
+
     public string $modPriority = "9999";
 
     public time $installDate;
@@ -66,6 +68,9 @@ class moduleInfo extends baseClass implements externalCallable
         "enabled" => [
             "type" => "INT",
             "index" => "INDEX"
+        ],
+        "modBuild"=> [
+            "type"=>"VARCHAR(255)",
         ],
         "singleInstanceOnly" => [
             "type" => "SKIP"

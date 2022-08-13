@@ -28,5 +28,9 @@ interface objectStorageClient
     public function createBucket($bucket);
 
     public function deleteBucket($bucket);
+
+    public function headBucket($bucket);
+
+    public function headObject($bucket, $key);
 }
 ?>

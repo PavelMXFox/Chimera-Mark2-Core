@@ -4,7 +4,8 @@ namespace fox;
 /**
  *
  * Class fox\common
- *
+ * Common methods ex. generation GUID
+ * 
  * @copyright MX STAR LLC 2021
  * @version 4.0.0
  * @author Pavel Dmitriev
@@ -88,14 +89,34 @@ class common
         return $str;
     }
 
+    /**
+     * Generate uuid withous curly braces in lowercase
+     * xxx....xxx
+     **/
+
+    static function getUUID()
+    {
+        return strtolower(UUID::v4());
+    }
+
+    /**
+     * Generate GUID withous curly braces
+     * XXX.....XXX
+     **/
+
     static function getGUIDc()
     {
         return strtoupper(UUID::v4());
     }
 
+    /**
+     * Generate GUID with curly braces
+     * { XXX.....XXX }
+     **/
+
     static function getGUID()
     {
-        return chr(123) . getGUIDc() . chr(125);
+        return chr(123) . static::getGUIDc() . chr(125);
     }
 
     static function fullname2qname($first, $mid, $last)

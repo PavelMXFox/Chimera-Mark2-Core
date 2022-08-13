@@ -39,16 +39,16 @@ export function load() {
 		} else {
 			// auth
 			API.exec("POST", "auth/oauth",{hash: hash, code: code},loginSuccessCallback,false,function onFail(json) {
-				console.log(json);
+				let buttons={};
+				buttons["OK"]=function() {
+					UI.closeDialog("dialogInfo");
+					load();
+				}
+
 				if (json.status.code==401 && json.data.error.xCode=="UNR") {
-					let buttons={};
-					buttons["OK"]=function() {
-						UI.closeDialog("dialogInfo");
-						load();
-					}
 					UI.showInfoDialog(langPack.core.iface.oauthLoginFailedUNR,langPack.core.iface.loginFailedDialogTitle,buttons);
 				} else {
-					console.log("Error:",json);
+					UI.showInfoDialog(langPack.core.iface.oauthLoginFailed500,langPack.core.iface.loginFailedDialogTitle,buttons);
 				}
 			});
 		}		

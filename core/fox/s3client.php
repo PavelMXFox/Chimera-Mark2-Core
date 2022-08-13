@@ -1,6 +1,8 @@
 <?php
 namespace fox;
 
+use Exception;
+
 /**
  *
  * Class fox\s3client
@@ -138,6 +140,22 @@ class s3client implements objectStorageClient
     
     public function __destruct() {
         $this->s3=null;
+    }
+
+
+    public function headBucket($bucket) {
+        try {
+            if ($this->s3->headBucket(["Bucket" => $this->prefix . $bucket])) {
+                return true;
+            }
+        } catch (Exception $e) {
+            return false;
+            
+        }
+    }
+
+    public function headObject($bucket, $key) {
+        return false;
     }
 }
 

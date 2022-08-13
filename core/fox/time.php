@@ -100,6 +100,18 @@ class time implements stringExportable, stringImportable, \JsonSerializable
         return $this->stamp;
     }
 
+    public static function formatInterval($val) {
+        $durWeeks=floor($val/604800);
+        $durXWeeks=$val % 604800;
+        $durDays=floor($durXWeeks/86400);
+        $durXDays=$durXWeeks % 86400;
+        $durHrs=floor($durXDays/3600);
+        $durXHrs=$durXDays % 3600;
+        $durMins=floor($durXHrs/60);
+        $durSecs=floor($durXHrs % 60);
+        
+        return ($durWeeks>0?$durWeeks."W ":"").($durDays>0?$durDays."D ":"").str_pad($durHrs,2, "0", STR_PAD_LEFT).":".str_pad($durMins,2, "0", STR_PAD_LEFT).":".str_pad($durSecs,2, "0", STR_PAD_LEFT);
+    }
 }
 
 ?>

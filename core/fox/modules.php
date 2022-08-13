@@ -162,6 +162,7 @@ class modules implements externalCallable
                     if ($modDesc->name != $modInfo->name) { throw new foxException("Module name mismatch for ".$modInfo->name); }
                     $modInfo->title=$modDesc->title;
                     $modInfo->modVersion=$modDesc->version;
+                    @$modInfo->modBuild=$modDesc->build;
                 } catch (\Exception $e) {
                     trigger_error($e->getMessage());
                     continue;

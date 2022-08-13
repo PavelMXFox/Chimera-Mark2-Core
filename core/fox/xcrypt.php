@@ -31,8 +31,6 @@ class xcrypt
 
     static function decrypt($val, $key = null)
     {
-        $ENC_KEY = substr(md5(config::get("masterSecret")), 0, 24);
-
         if (isset($key)) {
             $ENC_KEY = substr(md5($key), 0, 24);
         } else {

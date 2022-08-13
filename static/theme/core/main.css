@@ -34,6 +34,7 @@
 --mxs-switch-off: rgba(00,64,128,0.2);
 --mxs-switch-disabled: rgba(50,50,50,1);
 --mxs-switch-blocked: rgba(255,111,0,0.8);
+--mxs-switch-warn: var(--mxs-switch-blocked);
 --mxs-switch-alert: rgba(255,35,0,0.8);
 
 --mxs-title-font: 'Jura', sans-serif;

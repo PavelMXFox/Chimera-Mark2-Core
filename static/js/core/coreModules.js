@@ -34,7 +34,7 @@ function reloadInstalled() {
 			$("<td>",{class: "", text: mod.name}).appendTo(row);
 			$("<td>",{class: "", text: mod.enabled}).appendTo(row);
 			$("<td>",{class: "", text: mod.instanceOf}).appendTo(row);
-			$("<td>",{class: "", text: mod.modVersion}).appendTo(row);
+			$("<td>",{class: "", text: mod.modVersion+"."+mod.modBuild}).appendTo(row);
 			$("<td>",{class: "", text: mod.title}).appendTo(row);
 			$("<td>",{class: "", text: UI.stamp2date(mod.installDate,true)}).appendTo(row);
 			$("<td>",{class: "", text: UI.stamp2date(mod.updateDate,true)}).appendTo(row);
@@ -157,7 +157,7 @@ function reloadAvail() {
 			let row=$("<tr>",{}).bind('contextmenu', mlaContextMenuOpen).addClass("contextMenu").attr("modName",mod.name).attr("modTitle",mod.title);
 			$("<td>",{class: "idx", text: i}).appendTo(row);
 			$("<td>",{class: "", text: mod.name}).appendTo(row);
-			$("<td>",{class: "", text: mod.modVersion}).appendTo(row);
+			$("<td>",{class: "", text: mod.modVersion+"."+mod.modBuild}).appendTo(row);
 			$("<td>",{class: "", text: mod.title}).appendTo(row);
 			$("<td>",{class: "", html: mod.singleInstanceOnly?'<i class="far fa-check-square"></i>':""}).appendTo(row);
 			$("<td>",{class: "", text: mod.instancesCount}).appendTo(row);

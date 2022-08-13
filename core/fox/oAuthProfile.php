@@ -40,6 +40,7 @@ class oAuthProfile extends baseClass implements externalCallable {
     protected function validateSave()
     {
         if (empty($this->hash)) {
+            trigger_error($this->hash);
             $this->hash=xcrypt::hash(json_encode($this));
         }
         return true;
@@ -142,7 +143,7 @@ class oAuthProfile extends baseClass implements externalCallable {
         if (!empty($request->requestBody->clientId)) { $m->clientId=common::clearInput($request->requestBody->clientId,"0-9A-Za-z._:/-"); }
         if (!empty($request->requestBody->clientKey)) { $m->clientKey=common::clearInput($request->requestBody->clientKey,"0-9A-Za-z._@-"); }
         $m->config=$request->requestBody->config;
-        $m->hash=common::clearInput($request->requestBody->hash,"0-9A-Za-z._@-");
+        if (property_exists($request->requestBody,"hash")) { $m->hash=common::clearInput($request->requestBody->hash,"0-9A-Za-z._@-"); }
         $m->save();
         static::log($request->instance,__FUNCTION__, "OAuth profile ".$m->name." updated.",$request->user,"oAuthProfile",$m->id,null,logEntry::sevInfo,["changelog"=>$m->changelog]);
     }

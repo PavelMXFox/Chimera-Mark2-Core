@@ -105,6 +105,20 @@ export function exec(requestType, method , data, onSuccess,noblank,onError,versi
 	});	
 }
 
+export function getFileByToken(token, fileName) {
+    let  url='/api/v2/core/file/'+token;
+    
+    const a = document.createElement('a')
+    a.href = url
+    if (fileName != undefined) {
+        a.download=fileName;
+    }
+    
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a);
+}
+
 export class settings {
 	static async load() {
 		if (sessionStorage.getItem("baseSettings")==undefined) {

@@ -30,7 +30,8 @@ try {
     }
     $request->shift();
     $modules=moduleInfo::getAll();
-    if (!array_key_exists(request::get()->module, $modules)) {
+    $reqModule=request::get()->module;
+    if (!array_key_exists($reqModule, $modules)) {
         if (request::get()->authOK) {
             throw new foxException("Invalid module",404);
         } else {
@@ -38,11 +39,8 @@ try {
         }
     }
     
-    if ($modules[request::get()->module]->authRequired && !request::get()->authOK) {
-        throw new foxException("Unauthorized",401);
-    }
     
-    $modNS=$modules[request::get()->module]->namespace;
+    $modNS=$modules[$reqModule]->namespace;
     request::get()->shift();
     $className=$modNS."\\".request::get()->module;
     if (!class_exists($className)) {
@@ -60,23 +58,45 @@ try {
     $apiFunction=fox\common::clearInput($request->function,"a-zA-Z0-9");
     $apiXFunction=empty($request->parameters[0])?NULL:fox\common::clearInput($request->parameters[0],"a-zA-Z0-9");
     
-    $apiCallMethod="API_".$apiMethod."_".$apiFunction;
-    $apiXCallMethod="APIX_".$apiMethod."_".$apiXFunction;
-    $apiZCallMethod="API_".$apiMethod;
-    
-    if (method_exists($className, $apiCallMethod)) {
-        $rv=$className::$apiCallMethod($request);
-    } else if (($apiXFunction!==null) && method_exists($className, $apiXCallMethod)) {
-        $rv=$className::$apiXCallMethod($request);
-    } else if (method_exists($className, $apiZCallMethod)) {
-        $rv=$className::$apiZCallMethod($request);
-    } else if (method_exists($className, "APICall")) {
-        $rv=$className::apiCall(request::get());
+
+    if ($modules[$reqModule]->authRequired && !request::get()->authOK) {
+        
+        $apiPCallMethod="API_UnAuth_".$apiMethod."_".$apiFunction;
+        $apiPXCallMethod="APIX_UnAuth_".$apiMethod."_".$apiXFunction;
+        $apiPZCallMethod="API_UnAuth_".$apiMethod;
+        
+        if (method_exists($className, $apiPCallMethod)) {
+            $rv=$className::$apiPCallMethod($request);
+        } else if (($apiXFunction!==null) && method_exists($className, $apiPXCallMethod)) {
+            $rv=$className::$apiPXCallMethod($request);
+        } else if (method_exists($className, $apiPZCallMethod)) {
+            $rv=$className::$apiPZCallMethod($request);
+        } else {
+            throw new foxException("Unauthorized",401);
+        }
+        
+        foxRequestResult::throw("200", "OK", $rv);
+        
     } else {
-        throw new foxException("Method not allowed", 405);
+
+        $apiCallMethod="API_".$apiMethod."_".$apiFunction;
+        $apiXCallMethod="APIX_".$apiMethod."_".$apiXFunction;
+        $apiZCallMethod="API_".$apiMethod;
+        
+        if (method_exists($className, $apiCallMethod)) {
+            $rv=$className::$apiCallMethod($request);
+        } else if (($apiXFunction!==null) && method_exists($className, $apiXCallMethod)) {
+            $rv=$className::$apiXCallMethod($request);
+        } else if (method_exists($className, $apiZCallMethod)) {
+            $rv=$className::$apiZCallMethod($request);
+        } else if (method_exists($className, "APICall")) {
+            $rv=$className::apiCall(request::get());
+        } else {
+            throw new foxException("Method not allowed", 405);
+        }
+        
+        foxRequestResult::throw("200", "OK", $rv);
     }
-    
-    foxRequestResult::throw("200", "OK", $rv);
     
 } catch (fox\foxRequestResult $e) {
     ob_clean();

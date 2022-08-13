@@ -2,6 +2,7 @@
 
 use fox\modules;
 use fox\config;
+use fox\moduleInfo;
 
 include(__DIR__."/../Autoloader.php");
 
@@ -49,6 +50,18 @@ foreach (scandir(modules::packagesDir) as $file) {
         if (file_exists(modules::modulesDir."/".$newModInfo->name."/fox-start.d")) {
             system("chmod a+x \"".modules::modulesDir."/".$newModInfo->name."/fox-start.d/\"*");
         }
+
+        $mods = moduleInfo::getAll();
+
+        foreach($mods as $mod) {
+            if ($newModInfo->name==$mod->instanceOf) {
+                $mod->modVersion=$newModInfo->version;
+                $mod->modBuild=$newModInfo->build;
+                $mod->save();
+            }
+        }
+
+
         print "OK\n";
     }    
 }

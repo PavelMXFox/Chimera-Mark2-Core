@@ -17,6 +17,7 @@ use fox\foxException;
 use fox\request;
 use fox\modules;
 use fox\foxRequestResult;
+use fox\moduleInfo;
 
 class session implements externalCallable
 {
@@ -35,6 +36,7 @@ class session implements externalCallable
                 if ($request->authOK) {
                     $modules=[];
                     $i = 0;
+                    
                     foreach (modules::listInstalled() as $mod) {
                         if ($request->user->checkAccess($mod->globalAccessKey, $mod->name)) {
                             $i ++;
@@ -48,11 +50,12 @@ class session implements externalCallable
                         }
                     }
 
+                   
                     return [
                         "updated" => time(),
                         "user" => $request->token->user,
                         "acls" => $request->user->getAccessRules(),
-                        "modules" => $modules
+                        "modules" => $modules,
                     ];
                 }
                 throw new foxException("Unauthorized", 401);

@@ -77,6 +77,8 @@ class baseModule
     
     public static $crontab=[];
 
+    public static $themes=[];
+
     public static function getModInfo(): moduleInfo
     {
         $mi = new moduleInfo();
@@ -90,6 +92,7 @@ class baseModule
         $mi->globalAccessKey = static::$globalAccessKey;
         $mi->languages = static::$languages;
         $mi->configKeys=static::$configKeys;
+        $mi->themes=static::$themes;
 
         return $mi;
     }

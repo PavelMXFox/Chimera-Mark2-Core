@@ -7,4 +7,6 @@
 # |  |  |  |  |
 # *  *  *  *  * user-name command to be executed
 * * * * * www-data bash -c '/var/www/html/fox-cron.d/cron.php &>> /var/log/fox/fox-cron.log'
+* * * * * www-data bash -c '/var/www/html/fox-cron.d/expungeFiles.php &>> /var/log/fox/fox-cron.log'
+* * * * * www-data bash -c '/var/www/html/fox-cron.d/flushExpiredConfirmationCodes.php &>> /var/log/fox/fox-cron.log'
 

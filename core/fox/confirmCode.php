@@ -84,6 +84,11 @@ class confirmCode extends baseClass {
         
         return !$this->fillByHash();
     }
+
+    public static function flushExpired() {
+        $sql=static::qGetSql();
+        $sql->quickExec("DELETE FROM `".static::$sqlTable."` where `expireStamp` < '".time::current()."'");
+    }
 }
 
 ?>

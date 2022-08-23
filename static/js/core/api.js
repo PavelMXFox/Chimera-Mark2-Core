@@ -119,6 +119,38 @@ export function getFileByToken(token, fileName) {
     document.body.removeChild(a);
 }
 
+function  uploadFileToken(file, token){ 
+    let formData = new FormData();
+    formData.append(token, file);
+    fetch('/api/v2/core/file', {
+        method: "POST", body: formData
+    });
+}
+
+export function uploadFiles(method, filesFieldId, extraFields) {
+	let data={};
+	if (typeof(extraFields)=='object') {
+		let data=extraFields;
+	}
+
+    let files = document.getElementById(filesFieldId).files;
+    $.each(files, function(_key, file) {
+        data.fileName=file.name;
+        data.fileSize=file.size;
+
+        API.exec({
+            requestType: "POST",
+            method: method,
+            data: data,
+            onSuccess: function(json) {
+                uploadFileToken(file, json.data.Token);
+                return false;
+            }
+        })
+    })
+    return;
+}
+
 export class settings {
 	static async load() {
 		if (sessionStorage.getItem("baseSettings")==undefined) {
@@ -273,6 +305,11 @@ export class session {
 		sessionStorage.setItem("session",JSON.stringify(xsession));
 	}
 	
+	static async reload(callback) {
+		sessionStorage.removeItem("session");
+		this.load(callback);
+	}
+
 	static async load(callback) {
 		let token=localStorage.getItem("token");
 		if (token===null) {

@@ -12,9 +12,11 @@ namespace fox\meta;
  *
  **/
 
+use fox\cache;
 use fox\externalCallable;
 use fox\request;
 use fox\config;
+use fox\moduleInfo;
 use fox\time;
 use fox\modules;
 use fox\oAuthProfile;
@@ -23,18 +25,44 @@ class settings implements externalCallable
 {
     public static function APICall(request $request)
     {
-        $profiles = oAuthProfile::search()->result;
-        $oauth=[];
-        foreach ($profiles as $p) {
-            if ($p->enabled) {
-                $oauth[] = [
-                    "name"=>$p->name,
-                    "id"=>$p->id,
-                    "icon"=>$p->getClient(null)->getAuthIcon(),
-                ];
+        $c=new cache();
+
+        $oauth=$c->get("coreSettingsOauthProfiles");
+        if ($oauth==null) {
+            $profiles = oAuthProfile::search()->result;
+            $oauth=[];
+            foreach ($profiles as $p) {
+                if ($p->enabled) {
+                    $oauth[] = [
+                        "name"=>$p->name,
+                        "id"=>$p->id,
+                        "icon"=>$p->getClient(null)->getAuthIcon(),
+                    ];
+                }
             }
+            $c->set("coreSettingsOauthProfiles", $oauth);
+        }
+
+
+        $themes=$c->get("coreSettingsThemes");
+        if ($themes==null) {
+            $themes=[];
+            foreach (moduleInfo::getByFeature("theme") as $mod) {
+                if ($mod->themes) {
+                    $themes=array_merge($themes, $mod->themes);        
+                } else {
+                    $themes[$mod->name]=$mod->title;
+                }
+            }
+            $c->set("coreSettingsThemes",$themes);
         }
                 
+        $coreLangs=$c->get("coreSettingsLanguages");
+        if ($coreLangs==null) {
+            $coreLangs=modules::list()["core"]->languages;
+            $c->set("coreSettingsLanguages",$coreLangs);
+        }
+        
         return [
             "title" => config::get("TITLE"),
             "sitePrefix" => config::get("SITEPREFIX"),
@@ -45,8 +73,9 @@ class settings implements externalCallable
             "language" => config::get("DEFAULT_LANGUAGE") === null ? "ru" : config::get("DEFAULT_LANGUAGE"),
             "defaultModule" => config::get("DEFAULT_MODULE") === null ? "core" : config::get("DEFAULT_MODULE"),
             "sessionRenewInterval" => config::get("SESSION_RENEW_SEC") === null ? "3600" : config::get("SESSION_RENEW_SEC"),
-            "coreLanguages" => modules::list()["core"]->languages,
+            "coreLanguages" => $coreLangs,
             "oauthProfiles"=>$oauth,
+            "themes"=>$themes,
         ];
     }
 }

@@ -42,13 +42,18 @@ export var langItem={
 		open: "Открыть",
 		dialodAddButton: "Добавить",
 		dialodCreateButton: "Создать",
-		dialodSaveButton: "Записать",
+		dialodSaveButton: "Сохранить",
 		dialodInfoTitle: "Информация",
 		dialogRegisterButton: "Регистрация",
 		dialogRecoveryButton: "Восстановить",
 		dialogRegisterTitle: "Регистрация",
 		dialogReсoveryTitle: "Восстановление доступа",
 		genDescTitle: "Информация",
+		configTitle: "Настройки",
+		messagesTitle: "Сообщения",
+		agreementsTitle: "Документы для ознакомления",
+		logTitle: "История",
+		messengersTitle: "Мессенджеры",
 		contextMenuCopySelected: "Копировать выделение",
 		contextMenu: "Открыть действия",
 		actions: "Действия",
@@ -76,6 +81,10 @@ export var langItem={
 		company: "Компания",
 		companies: "Компании",
 		uid: "UID",
+		filesClickForSelect: "Нажмите для выбора файла",
+		filesSelected: "Выбрано",
+		filesFile: "файл",
+		filesFiles: "файлов",
 		comps: {
 			qName: "Алиас",
 			company: "Компания",
@@ -137,6 +146,7 @@ export var langItem={
 			invitationExpire: "Срок действия",
 			inviteToGroupTitleQ: "Группы",
 			delInvDialogTitle: "Удалить приглашение",
+			resendConfirmationCode: "Отправить код подтверждения",
 			recoveryFormText: "Укажите адрес электронной почты, на который был зарегистрирован аккаунт и код подтверждения (если есть), полученный по eMail для завершения восстановления",
 			recoverSentSucces: "Код подтверждения отправлен на указанный адрес. Введите его в поле \"код\" для продолжения процедуры.",
 			enterNewPasswordText: "Введите новый пароль",
@@ -154,7 +164,7 @@ export var langItem={
 				RNE: "Регистрация запрещена. Обратитесь к администратору для получения приглашения",
 				ILF: "Некорректный формат логина - логин не может начинаться с цифры, может содержать цифры и буквы, а так же должен быть не мельше 5 символов.",
 				IPF: "Некорректный формат пароля. Пароль должен быть не меньше 6 символов и содержать в своем составе цифры, буквы и спец. символы",
-				URNF: "Пользователь не найден либо восстановление пароля не предусмотрено спосбом авторизации", 
+				URNF: "Пользователь не найден либо восстановление пароля не предусмотрено способом авторизации", 
 				IVCC: "Некорректный код подтверждения. Проверьте правильность кода и повторите попытку.",
 			}
 		},
@@ -187,6 +197,15 @@ export var langItem={
 			}
 		}
 
+	},
+	languages: {
+		ru: "Русский",
+		en: "Английский",
+	},
+	userSettings: {
+		language: "Язык интерфейса",
+		pageSize: "Элементов на странице",
+		theme: "Тема оформления",
 	},
 	breadcrumbs: {
 		modTitle: "Система",

@@ -29,6 +29,8 @@ class moduleInfo extends baseClass implements externalCallable
 
     public array $features = [];
 
+    public array $themes=[];
+
     public bool $enabled = true;
 
     public string $modVersion = "1.0.0";
@@ -104,6 +106,9 @@ class moduleInfo extends baseClass implements externalCallable
         ],
         "configKeys" => [
             "type" => "SKIP"
+        ],
+        "themes" => [
+            "type" => "SKIP"
         ]
     ];
 
@@ -123,6 +128,7 @@ class moduleInfo extends baseClass implements externalCallable
             $this->namespace = $this->template->namespace;
             $this->languages = $this->template->languages;
             $this->configKeys= $this->template->configKeys;
+            $this->themes=$this->template->themes;
         }
         return $rv;
     }

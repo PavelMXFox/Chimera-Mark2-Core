@@ -50,6 +50,7 @@ function doValidation(code) {
 			};
 			
 			UI.showInfoDialog(langPack.core.iface.ok0,langPack.core.iface.dialodInfoTitle,buttons);
+			API.session.reload();
 			return false;
 		}
 	});

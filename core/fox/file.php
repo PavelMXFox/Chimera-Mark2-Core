@@ -30,9 +30,10 @@ class file extends baseClass implements externalCallable {
     protected $__data;
     
     public static $sqlTable="tblFiles";
+    public static $allowDeleteFromDB = true;
 
-    # file access token expires in 30 seconds
-    const fileTokenTTL=30; 
+    # file access token expires in 120 seconds
+    const fileTokenTTL=120; 
     const defaultBucket="files";
     
     protected function __xConstruct() {
@@ -78,6 +79,16 @@ class file extends baseClass implements externalCallable {
     ];
 
 
+    protected function validateDelete()
+    {
+        if (empty($this->id)) { throw new foxException("Unable to delete empty file"); }
+        if ($this->uuid) {
+            $s3=new s3client();
+            $s3->deleteObject(static::defaultBucket, $this->uuid);
+        }
+        return true;
+    }
+
     protected function validateSave()
     {
         if (empty($this->uuid)) { $this->uuid = common::getUUID(); }
@@ -103,6 +114,10 @@ class file extends baseClass implements externalCallable {
             $xWhere .= ($xWhere?" AND ":"")." `refId` = '".common::clearInput($options["refId"])."'";
         }
 
+        if (!empty($options["expired"])) {
+            $xWhere .= ($xWhere?" AND ":"")." `expireStamp` <= '".time::current()."'";
+        }
+
 
         if ($xWhere) {
             if ($where) {
@@ -114,7 +129,7 @@ class file extends baseClass implements externalCallable {
         return ["where"=>$where, "join"=>null];
     }
 
-    protected static function prepareFileUpload($data, $fileName, object $ref, string $instance=null, user $owner=null, $ttl=null) {
+    protected static function prepareFileUpload($fileName, object $ref, string $instance=null, user $owner=null, $ttl=null) {
         $f=new static();
         $f->fileName=$fileName;
         $f->module=$instance;
@@ -125,14 +140,26 @@ class file extends baseClass implements externalCallable {
         return $f;
     }
 
-    public static function directUpload($data, $fileName, object $ref, string $instance=null, user $owner=null, $ttl=null) {
-        $f=static::prepareFileUpload($data, $fileName, $ref, $instance, $owner, $ttl);
+    public function upload($data) {
+        if (!empty($this->id)) {
+            throw new foxException("Not allowed for existing files");
+        }
+
+        if (empty($this->uuid)) {
+            throw new foxException("Empty UUID not allowed here");
+        }
+
         $s3=new s3client();
         if (!$s3->headBucket(static::defaultBucket)) {
             $s3->createBucket(static::defaultBucket);
         }
-        $s3->putObject(static::defaultBucket,$f->uuid, $data);
-        $f->save();
+        $s3->putObject(static::defaultBucket,$this->uuid, $data);
+        $this->save();
+    }
+    
+    public static function directUpload($data, $fileName, object $ref, string $instance=null, user $owner=null, $ttl=null) {
+        $f=static::prepareFileUpload($fileName, $ref, $instance, $owner, $ttl);
+        $f->upload($data);
         return $f;
     }
 
@@ -163,20 +190,21 @@ class file extends baseClass implements externalCallable {
         return $token;
     }
 
-    public static function getByToken($token) {
+    public static function getByToken($token, $upload=false) {
         $c=new cache();
-        $ftile=$c->get('fileDnldToken-'.$token,true);
+        $prefix=$upload?"fileUpldToken":"fileDnldToken";
+        $ftile=$c->get($prefix.'-'.$token,true);
         if ($ftile) {
             $file = new static($ftile);
-            $c->del('fileDnldToken-'.$token);
+            $c->del($prefix.'-'.$token);
             return $file;
         } else {
             throw new foxException("Invalid token",404);
         }
     }
 
-    public static function getUploadToken($data, $fileName, object $ref, string $instance=null, user $owner=null) {
-        $f=static::prepareFileUpload($data, $fileName, $ref, $instance, $owner);
+    public static function getUploadToken($fileName, object $ref, string $instance=null, user $owner=null) {
+        $f=static::prepareFileUpload($fileName, $ref, $instance, $owner);
         $token=common::genPasswd(32);
         $c=new cache();
         $c->set('fileUpldToken-'.$token,$f,static::fileTokenTTL);
@@ -194,6 +222,44 @@ class file extends baseClass implements externalCallable {
         header('Content-Disposition: attachment; filename='.$file2->fileName);
         print($file2->getContent());
         exit;
+    }
+
+    public static function API_UnAuth_POST(request $request) {
+        if (!empty($request->parameters))  throw new foxException("Invalid request", 400);
+
+        $err=false;
+        $rv=[];
+        foreach ($_FILES as $sFile) {
+            $sOK=$sFile["error"]==0;
+            if (!$sOK) {
+                throw new foxException("File upload error");
+            }
+        }
+
+        foreach ($_FILES as $token=>$sFile) {
+            $sOK=$sFile["error"]==0;
+            if ($sOK) {
+                $file = file::getByToken(common::clearInput($token),true);
+                $tmpPath=$sFile["tmp_name"];
+                $data=file_get_contents($tmpPath);
+                $file->upload($data);
+                $rv[$token]=[
+                    "fileName"=>$sFile["name"],
+                    "fileSize"=>$sFile["size"],
+                    "status"=>"OK",
+                ];
+            } else {
+                $err=true;
+                $rv[$token]=[
+                    "fileName"=>$sFile["name"],
+                    "status"=>"Fail",
+                ];
+            }
+        }
+        return [
+            "status"=>$err?"ERR":"OK",
+            "details"=>$rv,
+        ];
     }
 
 }

@@ -184,7 +184,7 @@ class user extends baseClass implements externalCallable
     public static function getByEmail($eMail) {
         $ref=new static();
         $sql = $ref->getSql();
-        $res = $sql->quickExec1Line($ref->sqlSelectTemplate. " where `eMail`='".common::clearInput($eMail,"@0-9A-Za-z._-")."'");
+        $res = $sql->quickExec1Line($ref->sqlSelectTemplate. " where `eMail`='".common::clearInput($eMail,"@0-9A-Za-z._-")."' and `deleted` != 1");
         if ($res) {
             return new static($res);
         } else {
@@ -354,8 +354,73 @@ class user extends baseClass implements externalCallable
             static::log($request->instance,__FUNCTION__, "Mail address confirmed for user ".$request->user->login,$request->user,"user",$request->user->id,null,logEntry::sevInfo);
             return;
         } else {
-            foxException::throw("ERR", "Validation failed", 400);
+            foxException::throw("ERR", "Validation failed", 400,"IVCC");
         }
+    }
+
+    public static function API_PATCH(request $request) {
+        if (!empty($request->parameters)) { throw new foxException("Invalid request", 400); }
+        if ($request->user->id == $request->function) {
+            $u=$request->user;
+        } else {
+            $request->blockIfNoAccess("adminUsers", "core");
+            $u=new static(common::clearInput($request->function));
+        }
+
+        $resendEMailConfirmation=false;
+        if (property_exists($request->requestBody, "fullName")) { $u->fullName=$request->requestBody->fullName; }
+        if (property_exists($request->requestBody, "enabled")) { $u->active=$request->requestBody->enabled==1; }
+        if (property_exists($request->requestBody, "eMail")  && $request->requestBody->eMail != $u->eMail) { 
+            if ($request->requestBody->eMail && !common::validateEMail($request->requestBody->eMail)) {
+                foxException::throw(foxException::STATUS_ERR, "Invalid email format", 400, "WREML");
+            }
+
+            if ($request->requestBody->eMail) {
+                if ($rx=static::getByEmail($request->requestBody->eMail)) {
+                    trigger_error(json_encode($rx));
+                    foxException::throw(foxException::STATUS_ERR, "EMail already in-use", 400, "UAX");
+                }
+                $u->eMail=$request->requestBody->eMail; 
+                $u->eMailConfirmed=false;
+                $resendEMailConfirmation=true;
+            } else {
+                $u->eMail=null;
+            }
+        }
+
+        if (!empty($request->requestBody->password)) {
+            if (strlen($request->requestBody->password) < 6) {
+                throw new foxException("Password too short");
+            }
+            
+            $u->setPassword($request->requestBody->password);
+        }
+        $u->save();
+        if ($resendEMailConfirmation) {
+            $u->sendEMailConfirmation();
+        }
+        return $u;
+    }
+
+    public static function APIX_PATCH_settings(request $request) {
+        if ($request->user->id == $request->function) {
+            $u=$request->user;
+        } else {
+            $request->blockIfNoAccess("adminUsers", "core");
+            $u=new static(common::clearInput($request->function));
+        }
+
+        foreach ($request->requestBody as $key=>$val) {
+            $u->config[common::clearInput($key)]=$val;
+        }
+        $u->save();
+        return $u->config;
+    }
+
+    public static function API_DELETE(request $request) {
+        $request->blockIfNoAccess("adminUsers", "core");
+        $u=new static(common::clearInput($request->function));
+        $u->delete();
     }
 }
 

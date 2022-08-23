@@ -347,7 +347,7 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
 					}
 				}
 
-  				item = $("<input>", {class: "i", id: ref.item, name: name, width: 'calc(100% - 44px)'})
+  				item = $("<input>", {type: "password", class: "i", id: ref.item, name: name, width: 'calc(100% - 44px)'})
 	    		.add($("<div>",{
 	    			class: "button short", 
 	    			style: "width: 25px; margin-right: 0; margin-left: 2; padding: 0; padding-top: 1; font-size: 13px;",
@@ -359,6 +359,8 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
 					}
     				let password=genPassword(args.chars, args.length);
 					$("#"+item_id).val(password);
+					$("#"+item_id).prop("type","input");
+
 					$("#"+item_id).change();
 					if (typeof(ref.newPasswdGenCallback)=="function") {
 						ref.newPasswdGenCallback(password);
@@ -372,9 +374,9 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
 	    		if (ref.args !== undefined) {
 	    			$.each(ref.args, function(arg,val) {
 						if (typeof(val)=='array' || typeof(val)=='object') {
-							item.append($("<option>",{value: val.val, text: val.title}));
+							item.append($("<option>",{value: val.val, text: val.title, selected: val.val==ref.val}));
 						} else {
-							item.append($("<option>",{value: arg, text: val}));
+							item.append($("<option>",{value: arg, text: val, selected: arg==ref.val}));
 						}
 	    				
 	    			});
@@ -393,6 +395,36 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
     			item.val(args.curr);
 
     			break;
+
+			case "file":
+				item = $("<input>",{ 
+					type: "file", 
+					id: ref.item, 
+					class: "ifile", 
+					multiple: ref.multiple==true,
+					change: function(ref) {
+						let files=ref.currentTarget.files;
+						let label=$("#"+ref.currentTarget.id+"__labelTitle");
+						
+						$("#"+ref.currentTarget.id+"__label").addClass("changed");
+						if (files.length==0) {
+							label.text(langPack.core.iface.filesClickForSelect);
+						} else if (files.length==1) {
+							label.text(langPack.core.iface.filesSelected+": 1 "+langPack.core.iface.filesFile);
+						} else {
+							label.text(langPack.core.iface.filesSelected+": "+files.length+" "+langPack.core.iface.filesFiles);
+						}
+					},
+				})
+				.add($("<label>", {
+					id: ref.item+"__label",
+					for: ref.item, 
+					append: $("<i>",{ class: "far fa-save", title: langPack.core.iface.filesClickForSelect})
+						.add($("<span>",{style: "margin-left: 10px;", id: ref.item+"__labelTitle",text: langPack.core.iface.filesClickForSelect}))
+					,
+				}))
+
+				break;
 
 			case "label":
 				item = $("<span>", {id: ref.item, class: "i", html: ref.val});
@@ -501,7 +533,7 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
 			if (typeof(ref.onContextMenu)=="function") {
 				rv.bind('contextmenu', ref.onContextMenu);
 				rv.addClass("withContextMenu");
-				rvv.append($("<i>",{style: "padding: 0 10px 0 10px; float: right;", class: "fas fa-ellipsis-v"}).bind('contextmenu click', ref.onContextMenu))
+				rvv.append($("<i>",{style: "width: 50px; text-align: right; padding-right: 10px;", class: "fas fa-ellipsis-v"}).bind('contextmenu click', ref.onContextMenu))
 			}
 		}
 
@@ -614,6 +646,15 @@ export function genPassword(chars, passwordLength) {
 	return password;
 }
 
+export function getId(ref) {
+	if (ref.id) {
+		return ref.id;
+	} else if (ref[0] && ref[0].id) {
+		return ref[0].id;
+	}
+
+}
+
 export function collectForm(formid, getall, withIDS, withREF, validate)
 {
 	if (typeof(formid)=='object') {
@@ -633,9 +674,10 @@ export function collectForm(formid, getall, withIDS, withREF, validate)
 	var cctr=0;
 	var cerr=0;
 	var key;
+
 	$('#'+formid+' .i'+((getall==true)?"":'.changed')).each(function() {
 	  if (isset(this.name)) {key = this.name} else {key = this.id}
-	  
+	  if(!isset(key)) { return; }
  	  if (getall) { 
 		
 		var reqx="false";
@@ -723,11 +765,13 @@ export function createDialog(body, title, buttons, height, columns, id) {
 	if (id==undefined) {id = 'dialogForm'; }
 	if (columns=='undefined') { columns=1; }
 	
-	$("<div>",{
+	let dx=$("<div>",{
 		id: id,
 		title: title,
 		style: "overflow: hidden;"
-	}).appendTo("body")
+	})
+	.prop("dxColumns",columns)
+	.appendTo("body")
 	.dialog({
 		autoOpen: false,
  		height: height,
@@ -740,18 +784,54 @@ export function createDialog(body, title, buttons, height, columns, id) {
 		buttons: buttons
 	})
 	.append(body);
+
+	return dx;
+	
 }
 
 export function openDialog(id) {
 	if (id==undefined) {id = 'dialogForm'; }
+	let dx;
+	if (typeof(id)=="object") {
+		dx=$(id);
+		id=dx.id;
+	} else {
+		dx=$("#"+id);
+	}
+	
 	$("#"+id+' .i').on("change",function() {on_valChanged($(this)); });
-	$("#"+id).dialog("open");
+	dx.dialog("open");
+
+	let height=$("#"+id).dialog("option","height");	
+
+	if (!height) {
+
+		let summHeight=0;
+		let maxHeight=0;
+		let columns = dx.prop("dxColumns");
+
+		$.each(dx.find(".crm_entity_block_group"), function(_key,val) {
+			summHeight +=val.clientHeight;
+			if (val.clientHeight>maxHeight) { maxHeight=val.clientHeight; }
+		})
+	
+		let halfHeight=Math.ceil(summHeight/columns);
+		let xHeight=(maxHeight>halfHeight)?maxHeight:halfHeight;
+	
+		dx.dialog("option","height", xHeight+180);
+	}
 }
 
 export function closeDialog(id) {
 	if (id==undefined) {id = 'dialogForm'; }
-	$("#"+id).dialog("close");
-	$("#"+id).remove();
+	let dx;
+	if (typeof(id)=="object") {
+		dx=$(id);
+	} else {
+		dx=$("#"+id);
+	}
+	dx.dialog("close");
+	dx.remove();
 }
 
 

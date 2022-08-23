@@ -25,13 +25,18 @@ class modules implements externalCallable
             "namespace" => "fox",
             "features" => [
                 "page",
-                "menu"
+                "menu",
+                "theme"
             ],
             "isTemplate" => true,
             "singleInstanceOnly" => true,
             "authRequired" => true,
             "languages" => [
                 "ru"
+            ],
+            "themes"=>[
+                "chimera"=>"Chimera Theme",
+                "polarfox"=>"PolarFox Theme",
             ],
             "ACLRules" => [
                 "isRoot" => "Superadmin user",

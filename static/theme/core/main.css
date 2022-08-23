@@ -957,6 +957,12 @@ div.crm_entity_field_block.withContextMenu a {
 	cursor: context-menu;
 }
 
+div.crm_entity_field_block.withContextMenu span,
+div.crm_entity_field_block.withContextMenu title, 
+div.crm_entity_field_block.withContextMenu a {
+	margin-right: -60px;
+}
+
 
 table.datatable.sel tr:hover td
 
@@ -1246,7 +1252,12 @@ div.crm_entity_field_block input, div.crm_entity_field_block select
 {
 height: 26px;
 }
-div.crm_entity_field_block input, div.crm_entity_field_block select, div.crm_entity_field_block textarea
+div.crm_entity_field_block input, 
+div.crm_entity_field_block select, 
+div.crm_entity_field_block textarea,
+div.crm_entity_field_block label,
+div.crm_entity_field_block span.i,
+div.crm_entity_field_block a.i
 {
 	
 	border: none;
@@ -1255,6 +1266,23 @@ div.crm_entity_field_block input, div.crm_entity_field_block select, div.crm_ent
 	box-shadow: none;
 	outline: none;
 	background: none;
+}
+div.crm_entity_field_block label {
+	display: inline-block;
+	height: 27px;
+}
+
+div.crm_entity_field_block span.i,
+div.crm_entity_field_block a.i 
+{
+	border-bottom-color: rgba(100,100,100,0.1);
+}
+div.crm_entity_field_block label,
+div.crm_entity_field_block span.i,
+div.crm_entity_field_block a.i
+{
+	display: inline-block;
+	height: 27px;
 }
 
 /* panel_full_normal */
@@ -1271,7 +1299,10 @@ div.crm_entity_block_group
 
 div.crm_entity_field_block input, 
 div.crm_entity_field_block select, 
-div.crm_entity_field_block textarea
+div.crm_entity_field_block textarea,
+div.crm_entity_field_block label,
+div.crm_entity_field_block span.i,
+div.crm_entity_field_block a.i
 {
 	width: 300px;
 	padding: 0 0 0 10px;
@@ -1293,7 +1324,10 @@ div.crm_entity_field_block textarea
 }
 .full-width-input div.crm_entity_field_block input, 
 .full-width-input div.crm_entity_field_block select, 
-.full-width-input div.crm_entity_field_block textarea 
+.full-width-input div.crm_entity_field_block textarea,
+.full-width-input div.crm_entity_field_block label,
+.full-width-input div.crm_entity_field_block span.i,
+.full-width-input div.crm_entity_field_block a.i 
 {
 	width: 1633px;
 }
@@ -1312,7 +1346,10 @@ div.widget_panel_left div.crm_entity_block_group
 
 div.widget_panel_left div.crm_entity_field_block input, 
 div.widget_panel_left div.crm_entity_field_block select, 
-div.widget_panel_left div.crm_entity_field_block textarea
+div.widget_panel_left div.crm_entity_field_block textarea,
+div.widget_panel_left div.crm_entity_field_block label,
+div.widget_panel_left div.crm_entity_field_block span.i,
+div.widget_panel_left div.crm_entity_field_block a.i
 {
 	width: 280px;
 }
@@ -1320,6 +1357,9 @@ div.widget_panel_left div.crm_entity_field_block textarea
 div.widget_panel_left div.crm_entity_field_block input.half, 
 div.widget_panel_left div.crm_entity_field_block select.half, 
 div.widget_panel_left div.crm_entity_field_block textarea.half
+div.widget_panel_left div.crm_entity_field_block label.half,
+div.widget_panel_left div.crm_entity_field_block span.i.half,
+div.widget_panel_left div.crm_entity_field_block a.i.half
 {
 	width: 132px;
 }
@@ -1338,7 +1378,10 @@ div.widget_panel_right div.crm_entity_block_group
 
 div.widget_panel_right div.crm_entity_field_block input, 
 div.widget_panel_right div.crm_entity_field_block select, 
-div.widget_panel_right div.crm_entity_field_block textarea
+div.widget_panel_right div.crm_entity_field_block textarea,
+div.widget_panel_right div.crm_entity_field_block label,
+div.widget_panel_right div.crm_entity_field_block span.i,
+div.widget_panel_right div.crm_entity_field_block a.i
 {
 	width: 300px;
 }
@@ -1355,7 +1398,10 @@ div.ui-dialog-content div.crm_entity_block_group
 }
 
 div.ui-dialog-content div.crm_entity_field_block input, 
-div.ui-dialog-content div.crm_entity_field_block textarea
+div.ui-dialog-content div.crm_entity_field_block textarea,
+div.ui-dialog-content div.crm_entity_field_block label,
+div.ui-dialog-content div.crm_entity_field_block span.i,
+div.ui-dialog-content div.crm_entity_field_block a.i
 {
 	width: 290px;
 }
@@ -1379,13 +1425,21 @@ div.widget_panel_right table.t_icon div.crm_entity_block_group
 
 div.widget_panel_right table.t_icon div.crm_entity_field_block input, 
 div.widget_panel_right table.t_icon div.crm_entity_field_block select, 
-div.widget_panel_right table.t_icon div.crm_entity_field_block textarea
+div.widget_panel_right table.t_icon,
+div.widget_panel_right table.t_icon div.crm_entity_field_block label,
+div.widget_panel_right table.t_icon div.crm_entity_field_block span.i,
+div.widget_panel_right table.t_icon div.crm_entity_field_block a.i
 {
 	width: 290px;
 }
 
 
-div.crm_entity_field_block input.half, div.crm_entity_field_block select.half, div.crm_entity_field_block textarea.half
+div.crm_entity_field_block input.half, 
+div.crm_entity_field_block select.half, 
+div.crm_entity_field_block textarea.half,
+div.crm_entity_field_block label.half,
+div.crm_entity_field_block span.i.half,
+div.crm_entity_field_block a.i.half
 {
 	width: 130px;
 }
@@ -1393,9 +1447,15 @@ div.crm_entity_field_block input.half, div.crm_entity_field_block select.half, d
 div.crm_entity_field_block input:focus,
 div.crm_entity_field_block select:focus,
 div.crm_entity_field_block textarea:focus,
+div.crm_entity_field_block label:focus,
+div.crm_entity_field_block span.i:focus,
+div.crm_entity_field_block a.i:focus,
 div.crm_entity_field_block input:focus.changed,
 div.crm_entity_field_block select:focus.changed,
 div.crm_entity_field_block textarea:focus.changed
+div.crm_entity_field_block label:focus.changed,
+div.crm_entity_field_block span.i:focus.changed,
+div.crm_entity_field_block a.i:focus.changed
 {
 	border: none;
 	border-bottom: 1px solid var(--mxs-green);
@@ -1406,7 +1466,12 @@ div.widget_panel_left div.crm_entity_block_group
 	margin-right: 0px;
 }
 
-div.crm_entity_field_block input:disabled,div.crm_entity_field_block select:disabled,div.crm_entity_field_block textarea:disabled
+div.crm_entity_field_block input:disabled,
+div.crm_entity_field_block select:disabled,
+div.crm_entity_field_block textarea:disabled,
+div.crm_entity_field_block label:disabled,
+div.crm_entity_field_block span.i:disabled,
+div.crm_entity_field_block a.i:disabled
 {
 	border: none;
 	border-bottom: 1px double var(--mxs-gray);	
@@ -1644,21 +1709,30 @@ table.t_icon
 
 div.crm_entity_field_block input.changed, 
 div.crm_entity_field_block select.changed, 
-div.crm_entity_field_block textarea.changed
+div.crm_entity_field_block textarea.changed,
+div.crm_entity_field_block label.changed,
+div.crm_entity_field_block span.i.changed,
+div.crm_entity_field_block a.i.changed
 {
 	border-bottom-color: rgba(255,111,16,0.6);
 }
 
 div.crm_entity_field_block input.saved, 
 div.crm_entity_field_block select.saved, 
-div.crm_entity_field_block textarea.saved
+div.crm_entity_field_block textarea.saved,
+div.crm_entity_field_block label.saved,
+div.crm_entity_field_block span.i.saved,
+div.crm_entity_field_block a.i.saved
 {
 	border-bottom-color: var(--mxs-green);
 }
 
 div.crm_entity_field_block input.alert, 
 div.crm_entity_field_block select.alert, 
-div.crm_entity_field_block textarea.alert
+div.crm_entity_field_block textarea.alert,
+div.crm_entity_field_block label.alert,
+div.crm_entity_field_block span.i.alert,
+div.crm_entity_field_block a.i.alert
 {
 	border-bottom-color: var(--mxs-red);
 	background-color: var(--mxs-inputalertbg);
@@ -1904,7 +1978,10 @@ div.crm_entity_block_group
 
 div.crm_entity_field_block input, 
 div.crm_entity_field_block select, 
-div.crm_entity_field_block textarea
+div.crm_entity_field_block textarea,
+div.crm_entity_field_block label,
+div.crm_entity_field_block span.i,
+div.crm_entity_field_block a.i
 {
 	width: 304px;
 }
@@ -1923,7 +2000,10 @@ div.crm_entity_field_block textarea
 
 .full-width-input div.crm_entity_field_block input, 
 .full-width-input div.crm_entity_field_block select, 
-.full-width-input div.crm_entity_field_block textarea 
+.full-width-input div.crm_entity_field_block textarea,
+.full-width-input div.crm_entity_field_block label,
+.full-width-input div.crm_entity_field_block span.i,
+.full-width-input div.crm_entity_field_block a.i
 {
 	width: 1310px;
 }
@@ -1984,7 +2064,10 @@ div.crm_entity_block_group
 
 div.crm_entity_field_block input, 
 div.crm_entity_field_block select, 
-div.crm_entity_field_block textarea
+div.crm_entity_field_block textarea,
+div.crm_entity_field_block label,
+div.crm_entity_field_block span.i,
+div.crm_entity_field_block a.i
 {
 	width: 307px;
 }
@@ -2003,7 +2086,10 @@ div.crm_entity_field_block textarea
 
 .full-width-input div.crm_entity_field_block input, 
 .full-width-input div.crm_entity_field_block select, 
-.full-width-input div.crm_entity_field_block textarea 
+.full-width-input div.crm_entity_field_block textarea,
+.full-width-input div.crm_entity_field_block label,
+.full-width-input div.crm_entity_field_block span.i,
+.full-width-input div.crm_entity_field_block a.i
 {
 	width: 993px;
 }
@@ -2115,7 +2201,10 @@ div.header
 
 .full-width-input div.crm_entity_field_block input, 
 .full-width-input div.crm_entity_field_block select, 
-.full-width-input div.crm_entity_field_block textarea 
+.full-width-input div.crm_entity_field_block textarea,
+.full-width-input div.crm_entity_field_block label,
+.full-width-input div.crm_entity_field_block span.i,
+.full-width-input div.crm_entity_field_block a.i
 {
 	width: 993px;
 }
@@ -2233,14 +2322,20 @@ div.widget_panel_left div.crm_entity_field_input
 
 div.widget_panel_left div.crm_entity_field_block input, 
 div.widget_panel_left div.crm_entity_field_block select, 
-div.widget_panel_left div.crm_entity_field_block textarea
+div.widget_panel_left div.crm_entity_field_block textarea,
+div.widget_panel_left div.crm_entity_field_block label,
+div.widget_panel_left div.crm_entity_field_block span.i,
+div.widget_panel_left div.crm_entity_field_block a.i
 {
 	width: 322px;
 }
 
 div.widget_panel_left div.crm_entity_field_block input.half, 
 div.widget_panel_left div.crm_entity_field_block select.half, 
-div.widget_panel_left div.crm_entity_field_block textarea.half
+div.widget_panel_left div.crm_entity_field_block textarea.half,
+div.widget_panel_left div.crm_entity_field_block label.half,
+div.widget_panel_left div.crm_entity_field_block span.i.half,
+div.widget_panel_left div.crm_entity_field_block a.i.half
 {
 	width: 153px;
 }
@@ -2259,14 +2354,20 @@ div.crm_entity_block_group
 
 div.crm_entity_field_block input, 
 div.crm_entity_field_block select, 
-div.crm_entity_field_block textarea
+div.crm_entity_field_block textarea,
+div.crm_entity_field_block label,
+div.crm_entity_field_block span.i,
+div.crm_entity_field_block a.i
 {
 	width: 315px;
 }
 
 div.crm_entity_field_block input.half, 
 div.crm_entity_field_block select.half, 
-div.crm_entity_field_block textarea.half
+div.crm_entity_field_block textarea.half,
+div.crm_entity_field_block label.half,
+div.crm_entity_field_block span.i.half,
+div.crm_entity_field_block a.i.half
 {
 	width: 150px;
 }
@@ -2290,7 +2391,10 @@ div.login
 
 .full-width-input div.crm_entity_field_block input, 
 .full-width-input div.crm_entity_field_block select, 
-.full-width-input div.crm_entity_field_block textarea 
+.full-width-input div.crm_entity_field_block textarea,
+.full-width-input div.crm_entity_field_block label,
+.full-width-input div.crm_entity_field_block span.i,
+.full-width-input div.crm_entity_field_block a.i
 {
 	width: 670px;
 }

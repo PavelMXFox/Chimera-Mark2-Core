@@ -23,25 +23,107 @@ function reloadUsers() {
 		$("<th>",{class: "", text: langPack.core.iface.users.fullName}).appendTo(tx);
 		$("<th>",{class: "", text: langPack.core.iface.users.eMainConfirmedQTitle}).appendTo(tx);
 		$("<th>",{class: "", text: langPack.core.iface.users.active}).appendTo(tx);
+		$("<th>",{class: "button", style: "text-align: center", append: $("<i>",{class: "fas fa-ellipsis-h"})}).appendTo(tx);
 		tx.appendTo("div.widget.users");
 		
 		let i=0;
 		$.each(json.data, function(idx, user) {
 			i++;
-			let row=$("<tr>",{});
+			let row=$("<tr>",{}).bind('contextmenu', usmContextMenuOpen).addClass("contextMenu").attr("userId",user.id).attr("xenabled",user.active?1:0).attr("xemconf",user.eMailConfirmed?1:0);
 			$("<td>",{class: "idx", text: i}).appendTo(row);
-			$("<td>",{class: "", text: UI.formatInvCode(user.invCode)}).appendTo(row);
+			$("<td>",{class: "xInvCode", text: UI.formatInvCode(user.invCode)}).appendTo(row);
 			$("<td>",{class: "", text: user.login}).appendTo(row);
 			$("<td>",{class: "", text: user.eMail}).appendTo(row);
-			$("<td>",{class: "", text: user.fullName}).appendTo(row);
+			$("<td>",{class: "xFullName", text: user.fullName}).appendTo(row);
 			$("<td>",{class: "", text: user.eMailConfirmed}).appendTo(row);
 			$("<td>",{class: "", text: user.active}).appendTo(row);
-			
+			$("<td>",{class: "button", style: "text-align: center", append: $("<i>",{class: "fas fa-ellipsis-h"})})
+			.click(usmContextMenuOpen)
+			.appendTo(row);	
+			//row.foxClick("/"+UI.parceURL().module+"/user/"+user.id);
 			
 			$("<tbody>",{append: row}).appendTo(tx);
 		});
 
 	})
+}
+
+function usmContextMenuOpen(el) {
+	let userUID=$(el.target).closest("tr").find("td.xInvCode").text();
+	let userName=$(el.target).closest("tr").find("td.xFullName").text();
+	let userEnabled=$(el.target).closest("tr").attr("xenabled")==1;
+	let xemconf=$(el.target).closest("tr").attr("xemconf")==1;
+	let userId=$(el.target).closest("tr").attr("userId");
+
+	let menuitems=[];
+	if (userEnabled) {
+		menuitems.push({title: langPack.core.iface.disable, onClick: function() {
+			toggleUserEnabled(userId,false, el)
+		}})
+	} else {
+		menuitems.push({title: langPack.core.iface.enable, onClick: function() {
+			toggleUserEnabled(userId,true, el);
+		}})
+	}
+
+	menuitems.push({title: langPack.core.iface.delete, onClick: function() {
+		deleteUser(userId, el);
+	}});
+
+	if (!xemconf && userEnabled) {
+		menuitems.push({title: langPack.core.iface.users.resendConfirmationCode, onClick: function() {
+			API.exec({
+				requestType: "GET",
+				method: "core/user/"+userId+"/sendEMailConfirmation",
+			})
+		}});
+	}
+
+	UI.contextMenuOpen(el,menuitems,userUID+" "+userName);
+	
+	return false;
+}
+
+function toggleUserEnabled(userId, state, ref) {
+
+	var buttons={};
+	buttons[langPack.core.iface.dialodSaveButton]=function() { 
+		$("#dialogInfo").dialog("close");
+		API.exec({
+			requestType: "PATCH",
+			method: "core/user/"+userId,
+			data: {"enabled": state==true?1:0 },
+			onSuccess: reloadUsers,
+			errDict: langPack.core.iface.groups.errors,
+		});		
+	};
+	
+	buttons[langPack.core.iface.dialodCloseButton]=function() {  $("#dialogInfo").dialog("close"); }
+
+	UI.showInfoDialog(langPack.core.iface[state?"enable":"disable"]+" #"+userId+" "+$(ref.target).closest("tr").find("td.xFullName").text()+"?",langPack.core.iface[state?"enable":"disable"],buttons);
+
+
+}
+
+function deleteUser(userId, ref) {
+
+	var buttons={};
+	buttons[langPack.core.iface.dialodDelButton]=function() { 
+		$("#dialogInfo").dialog("close");
+		API.exec({
+			requestType: "DELETE",
+			method: "core/user/"+userId,
+			onSuccess: reloadUsers,
+			errDict: langPack.core.iface.groups.errors,
+		});		
+	};
+	
+	buttons[langPack.core.iface.dialodCloseButton]=function() {  $("#dialogInfo").dialog("close"); }
+
+	UI.showInfoDialog(langPack.core.iface.delete+" #"+userId+" "+$(ref.target).closest("tr").find("td.xFullName").text()+"?",langPack.core.iface.delete,buttons);
+
+
+
 }
 
 function reloadInvites() {

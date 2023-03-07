@@ -1,6 +1,7 @@
 <?php
 namespace fox\auth;
 
+use fox\authJwt;
 use fox\externalCallable;
 use fox\request;
 use fox\oAuthProfile;
@@ -61,7 +62,8 @@ class oauth implements externalCallable
                 $t = authToken::issue($u, "WEB");
                 return [
                     "token" => $t->token,
-                    "expire" => $t->expireStamp->isNull() ? "Never" : $t->expireStamp
+                    "expire" => $t->expireStamp->isNull() ? "Never" : $t->expireStamp,
+                    "jwt"=>authJwt::issueByAuthToken($t)
                 ];
                 
                 break;

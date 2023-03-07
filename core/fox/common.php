@@ -212,5 +212,14 @@ class common
         }
         return $arr;
     }
+
+    static function array2string($arr, $splitter=',', $quotes='"') : string {
+        $rv="";
+        foreach ($arr as $val) {
+            $rv.=(empty($rv)?"":$splitter).$quotes.preg_replace("!$quotes+!","\\".$quotes, $val).$quotes;
+            
+        }
+        return $rv;
+    }
 }
 ?>

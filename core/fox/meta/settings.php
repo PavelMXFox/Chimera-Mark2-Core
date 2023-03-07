@@ -63,6 +63,7 @@ class settings implements externalCallable
             $c->set("coreSettingsLanguages",$coreLangs);
         }
         
+         
         return [
             "title" => config::get("TITLE"),
             "sitePrefix" => config::get("SITEPREFIX"),
@@ -76,6 +77,9 @@ class settings implements externalCallable
             "coreLanguages" => $coreLangs,
             "oauthProfiles"=>$oauth,
             "themes"=>$themes,
+            "rabbitMqEnabled"=>strtolower(config::get("RABBITMQ_ENABLED"))==="true",
+            "rabbitMqWS"=>config::get("RABBITMQ_WS_URL")===null?"/rabbitmq":config::get("RABBITMQ_WS_URL"),
+            "rabbitMqVHost"=>config::get("RABBITMQ_VHOST")===null?"/":config::get("RABBITMQ_VHOST")
         ];
     }
 }

@@ -10,4 +10,6 @@ RewriteRule "^theme/([^/]+)/font/([0-9a-zA-Z\.\-\_]*)" "/modules/$1/theme/font/$
 RewriteRule "^theme/([^/]+)/css/([0-9a-zA-Z\.\-\_]*\.css)" "/modules/$1/theme/css/$2" [L]
 
 RewriteRule "^js/([^/]+)/([0-9a-zA-Z\.\-\_]*\.js)" "/modules/$1/js/$2" [L]
+RewriteRule "^js/([^/]+)/([0-9a-zA-Z\.\-\_]*\.mjs\.map)" "/modules/$1/js/$2" [L]
+RewriteRule "^js/([^/]+)/([0-9a-zA-Z\.\-\_]*\.mjs)" "/modules/$1/js/$2" [L]
 RewriteRule "^css/([^/]+)/([0-9a-zA-Z\.\-\_]*\.css)" "/modules/$1/css/$2" [L]

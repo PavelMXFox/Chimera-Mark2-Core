@@ -15,7 +15,7 @@ var codes={
 export function showError(code, message) {
 	if (message==undefined) { message=codes[code]}
 	if (message==undefined) { message="Internal server error"}
-	$("<div>", { class: "error blanker bggray"}).appendTo("body");
+	$("<div>", { class: "error blanker bgerror"}).appendTo("body");
 	$("<div>", { class: "error error_banner",html: "ERROR "+code+"<br/>"+message}).appendTo("body");
 }
 
@@ -308,6 +308,7 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
 	} else {
 		var type=ref.type;
 	}
+	
 	if (typeof(ref.item)=="string" || ref.item===undefined)
 	{
 			
@@ -347,7 +348,7 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
 					}
 				}
 
-  				item = $("<input>", {type: "password", class: "i", id: ref.item, name: name, width: 'calc(100% - 44px)'})
+  				item = $("<input>", {type: ref.noHide?"input":"password", class: "i", id: ref.item, name: name, width: 'calc(100% - 44px)'})
 	    		.add($("<div>",{
 	    			class: "button short", 
 	    			style: "width: 25px; margin-right: 0; margin-left: 2; padding: 0; padding-top: 1; font-size: 13px;",
@@ -487,6 +488,8 @@ export function addField(ref)//title, item, blockstyle, fieldstyle, type, args, 
 	    		break
     	}
     	if (ref.disabled) { item.attr("disabled","true")}
+	} else {
+		item = ref.item;
 	}
 	
 	item.change(function() {$(this).addClass('changed');})
@@ -1007,8 +1010,14 @@ export function initBody() {
 				)
 			)
 			.append($("<div>", { style: "display: inline-block; float: right; padding-right: 10px;", id: "newMsgAlert"})
-				.append($("<i>",  {class: "fas fa-bell alert"}))
+				.append($("<i>",  {class: "fas fa-bell panel inactive"}))
 				.append($("<span>", { id: "coreMsgCount", text: "-"}))
+				.hide()
+			)
+			.append($("<div>", { style: "display: inline-block; float: right; padding-right: 10px;", id: "barcodeScannerStatus"})
+				.append($("<i>",  {class: "fas fa-qrcode panel inactive"}))
+				.attr("title","Barcode Scanner Off-Line")
+				.hide()
 			)
 			.append($("<div>", { style: "display: inline-block; float: left;  position: absolute; max-height: 18px; overflow: hidden;"})
 				.append($("<i>", { class: "far fa-lightbulb", style: "margin-right: 10px; font-size: 15px;"}))

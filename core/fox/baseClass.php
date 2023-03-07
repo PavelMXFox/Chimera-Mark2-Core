@@ -147,10 +147,10 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
         return true;
     }
 
-    public function __construct($id = null, ?namespace\sql $sql = null, $prefix = null, $settings = null)
+    public function __construct($id = null, ?namespace\sql $sql = null, $prefix = null, $settings = null, $loadDeleted=false)
     {
         # How to call from child template:
-        # parent::__construct($id, $sql, $prefix, $settings);
+        # parent::__construct($id, $sql, $prefix, $settings, $loadDeleted);
         $this->__settings = $settings;
         if (empty($this::$baseSqlSelectTemplate) && ! empty($this::$sqlTable)) {
             $this->__sqlSelectTemplate = "select `i`.* from `" . $this::$sqlTable . "` as `i`";
@@ -184,7 +184,7 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
                 if ($this instanceof stringImportable) {
                     $this->__fromString($id);
                 } elseif (is_numeric($id)) {
-                    $this->fill($id);
+                    $this->fill($id, $loadDeleted);
                 } elseif ($x = json_decode($id)) {
                     $this->fillFromRow($x);
                 } else {
@@ -192,7 +192,7 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
                 }
                 break;
             case "integer":
-                $this->fill($id);
+                $this->fill($id, $loadDeleted);
                 break;
             case "NULL":
                 break;
@@ -202,15 +202,19 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
         }
     }
 
-    protected function fill($id)
+    protected function fill($id, $loadDeleted=false)
     {
         if (! empty($this->__sqlSelectTemplate)) {
             $this->checkSql();
             $row = $this->sql->quickExec1Line($this->__sqlSelectTemplate . " where `i`." . $this::$sqlIdx . " = '" . $id . "'");
             if (! empty($row)) {
                 $this->fillFromRow($row);
+                if (!$loadDeleted && static::$deletedFieldName && $this->{static::$deletedFieldName}) {
+                    trigger_error("Record with " . (static::$sqlIdx) . " " . $id . " was deleted " . get_class($this));
+                    throw new foxException("Not found",404);
+                }
             } else {
-                throw new \Exception("Record with " . (static::$sqlIdx) . " " . $id . " not found in " . get_class($this), 691);
+                throw new foxException("Not found",404);
             }
         } else {
             throw new \Exception("Fill by ID not implemented in " . get_class($this), 592);
@@ -271,9 +275,9 @@ class baseClass extends dbStoredBase implements \JsonSerializable, jsonImportabl
 
             $class = get_class($this);
             if (is_numeric($this->{static::$sqlIdx})) {
-                $ref = new $class((int) $this->{static::$sqlIdx});
+                $ref = new $class((int) $this->{static::$sqlIdx}, loadDeleted: true);
             } else {
-                $ref = new $class($this->{static::$sqlIdx});
+                $ref = new $class($this->{static::$sqlIdx}, loadDeleted: true);
             }
 
             $this->changelog = "";

@@ -1,14 +1,30 @@
 import * as UI from './ui.js';
 import { langPack } from './langpack.js';
 
+var waitTokenRenew=false;
+var tokenCheckSheduled=false;
+var clockOffset=0;
+
 export function loadModule(modPath) {
 	import(modPath).then(function(mod) {
 		mod.load();
 	})
 }
+export async function sleepMs(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export function getCorrectedTime() {
+	let localTime=Date.now() / 1000 | 0;
+	let offset = localStorage.getItem("clockOffset");
+	if (offset==undefined) {
+		offset=0;
+	}
+	return localTime+Number(offset);
+}
 
 // errDict
-export function exec(requestType, method , data, onSuccess,noblank,onError,version)
+export async function exec(requestType, method , data, onSuccess,noblank,onError,version)
 {
 	
 	if (typeof(requestType)=='object') {
@@ -20,6 +36,7 @@ export function exec(requestType, method , data, onSuccess,noblank,onError,versi
 		noblank=ref.noblank;
 		onError=ref.onError;
 		version=ref.version;
+		var skipSessionCheck=ref.skipSessionCheck;
 		var xoss=true;
 	} else {
 		var xoss=false;
@@ -29,9 +46,20 @@ export function exec(requestType, method , data, onSuccess,noblank,onError,versi
 	if (requestType==undefined) { requestType="GET" }
 	if (requestType=="GET") { data=undefined; }
 	if (version==undefined) { version=2; }
+	if (skipSessionCheck==undefined) { skipSessionCheck=false }
 	if (!isset(method)) {
 		throw("Empty method not allowed");
 	} 
+
+	var transationStamp=(new Date()).getTime();
+
+	while (waitTokenRenew && !skipSessionCheck) {
+		await sleepMs(100);
+	}
+
+	if (!skipSessionCheck) {
+		await session.check();
+	}
 
 	let headers={};
 	let token=localStorage.getItem("token");
@@ -39,8 +67,9 @@ export function exec(requestType, method , data, onSuccess,noblank,onError,versi
 		headers.Authorization="Token "+token;	
 	}
 	
-	var transationStamp=(new Date()).getTime();
-
+	
+	//console.log("API Call started: "+requestType+" "+method + " : "+ transationStamp);
+	//console.log("Call token: "+token);
 	return $.ajax({
   		url: "/api/v"+String(version)+"/"+method,
   		data: JSON.stringify(data),
@@ -48,8 +77,15 @@ export function exec(requestType, method , data, onSuccess,noblank,onError,versi
   		headers: headers,
 		async: ref.async==undefined?true:ref.async,
 		complete: function(data,textStatus,request) {
+			let serverTime=UI.date2stamp(data.getResponseHeader('Date'));
+			let localTime=Date.now() / 1000 | 0;
+			clockOffset=serverTime-localTime;
+			localStorage.setItem("clockOffset", clockOffset);
+
+			var transationEndStamp=(new Date()).getTime();
+	//		console.log("API Call completed: "+requestType+" "+method + " : " + transationStamp + " : " + (transationEndStamp-transationStamp) + " ms");
 			if (data.getResponseHeader('X-Fox-Token-Renew') !=null) {
-				session.updateToken(data.getResponseHeader('X-Fox-Token-Renew'));					
+				session.updateToken(data.getResponseHeader('X-Fox-Token-Renew'),data.getResponseHeader('X-Fox-Token-Expire'),data.getResponseHeader('X-Fox-JWT'));					
 			}
 
 			let rcode=data.status;
@@ -81,23 +117,32 @@ export function exec(requestType, method , data, onSuccess,noblank,onError,versi
 				
 			} else {
 				UI.blankerHide();
-				if (typeof(onError) == 'function')
-				{
-					onError(rv, rtext);
-				} else {
-					if (isset(jdata) && isset(jdata.error) && isset(jdata.error.xCode)) {
-						var xCode=jdata.error.xCode;
-						if (isset(ref.errDict) && isset(ref.errDict[xCode])) {
-							rtext=ref.errDict[jdata.error.xCode];
-						} else {
-							rtext=xCode+" "+rtext;
-						}
+				let rtext2;
+
+				if (isset(jdata) && isset(jdata.error) && isset(jdata.error.xCode)) {
+					var xCode=jdata.error.xCode;
+					if (isset(ref.errDict) && isset(ref.errDict[xCode])) {
+						rtext=ref.errDict[jdata.error.xCode];
+						rtext2=rtext;
 					} else {
-						var xCode=rcode;
+						rtext2=rtext;
 						rtext=xCode+" "+rtext;
 					}
-					
-					UI.showInfoDialog({message: rtext, title: langPack.core.iface.err0,dialogName: "apiExecStatus"+transationStamp, closeCallback: ref.onFinal});
+				} else {
+					var xCode=rcode;
+					rtext2=rtext;
+					rtext=xCode+" "+rtext;	
+				}
+
+				if (typeof(onError) == 'function')
+				{
+					onError(rv, {code: xCode, message: rtext2});
+				} else {
+					if (onError=="blanker") {
+						UI.showError(xCode, rtext2);
+					} else {
+						UI.showInfoDialog({message: rtext, title: langPack.core.iface.err0,dialogName: "apiExecStatus"+transationStamp, closeCallback: ref.onFinal});
+					}
 				}
 			}
 		},
@@ -199,6 +244,7 @@ export class auth {
 		payload.type="WEB";
 		
 		API.exec("POST", "auth/login",payload, function onSuccess(json) {
+			console.log(json.data)
 			session.open(json.data)
 			if (typeof(callback) == 'function')
 			{
@@ -225,6 +271,80 @@ export class session {
 		}		
 	}
 	
+	static parseJwt () {
+		let token=localStorage.getItem("jwt");
+		if (!token) {
+			return null;
+		}
+		let base64Url = token.split('.')[1];
+		let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+		let jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+			return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+		}).join(''));
+		return JSON.parse(jsonPayload);
+	}
+
+	static getJwt() {
+		return localStorage.getItem("jwt");
+	}
+	
+	static sheduleCheck() {
+		//console.log("ScheduleCheck sheduler started");
+		if (!tokenCheckSheduled) {
+			//console.log("ScheduleCheck sheduler sheduled");
+			tokenCheckSheduled=true;
+			let token=session.parseJwt();
+			let dtx=token.exp-token.iat;
+			waitTokenRenew=false;
+			setTimeout(session.check, (dtx*0.25 | 0)*1000, true);
+		}
+	}
+
+	static async check(sheduled) {
+		//console.log((sheduled===true?"Sheduled":"Regular")+" token check executed")
+		if (sheduled===true) { 
+			tokenCheckSheduled=false;
+		}
+		if (waitTokenRenew) {
+			console.log("Token reneq already in progress");
+			return;
+		}
+		let token = session.parseJwt();
+		let now=getCorrectedTime();
+		
+		if (token) {
+			let dtx=token.exp-token.iat;
+			let renew = token.iat+(dtx/2 | 0)
+			if (renew < now) {
+				//console.log ("Token renew started");
+				waitTokenRenew=true;
+				await API.exec({
+					skipSessionCheck: true,
+					requestType: "GET",
+					method: "auth/renew",
+					noblank: true,
+					onSuccess: function(json) {
+						//console.log("Token renew success")
+						localStorage.setItem("token",json.data.token);
+						localStorage.setItem("tokenExpire",json.data.expire);
+						localStorage.setItem("jwt",json.data.jwt);
+						waitTokenRenew=false;
+						session.sheduleCheck();
+						return false;
+					},		
+					onError: function(error) {
+						console.log("Token renew failes with ERROR", error)
+						waitTokenRenew=false;
+						return false
+					}
+				})		
+			} else {
+				//console.log("Token not ready for renew")
+				session.sheduleCheck(); 
+			}
+		}
+	}
+	
 	static getLang() {
 		return this.getConfigItem("language");
 	}
@@ -232,19 +352,22 @@ export class session {
 	static close() {
  		localStorage.removeItem("token");
  		localStorage.removeItem("tokenExpire");
+		localStorage.removeItem("jwt");
  		sessionStorage.removeItem("session");
 	}
 	
 	static open(data) {
-		
  		localStorage.setItem("token",data.token);
- 		localStorage.setItem("tokenExpire",data.expire.stamp);
+ 		localStorage.setItem("tokenExpire",data.expire);
+		localStorage.setItem("jwt",data.jwt);
  		sessionStorage.setItem("session",data.session);
 
 	}	
 	
-	static updateToken(token) {
+	static updateToken(token, tokenExpire, jwt) {
 		localStorage.setItem("token",token);
+		localStorage.setItem("tokenExpire",tokenExpire);
+		localStorage.setItem("jwt",jwt);
 	}
 	
 	static get(key) {

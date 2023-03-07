@@ -101,7 +101,8 @@ class register implements externalCallable {
         $t = authToken::issue($u, "WEB");
         return [
             "token" => $t->token,
-            "expire" => $t->expireStamp->isNull() ? "Never" : $t->expireStamp
+            "expire" => $t->expireStamp->isNull() ? "Never" : $t->expireStamp,
+            "jwt"=>\fox\authJwt::issueByAuthToken($t)
         ];
     }
 
@@ -147,7 +148,8 @@ class register implements externalCallable {
             logEntry::add($request->instance, static::class, __FUNCTION__, null, "Password recovered for user ".$u->login, "INFO", $u,  "user", $u->id);
             return [
                 "token" => $t->token,
-                "expire" => $t->expireStamp->isNull() ? "Never" : $t->expireStamp
+                "expire" => $t->expireStamp->isNull() ? "Never" : $t->expireStamp,
+                "jwt"=>\fox\authJwt::issueByAuthToken($t)
             ];
         } else {
             foxException::throw("ERR", "Validation failed", 400,"IVCC");

@@ -23,6 +23,12 @@ class foxException extends \Exception
     public const STATUS_ALERT = "ALERT";
     public const STATUS_INFO = "INFO";
 
+    public const HTTP_NotAcceptable=406;
+    public const HTTP_NotFound=404;
+    public const HTTP_InvalidRequest=400;
+    public const HTTP_Conflict=409;
+    public const HTTP_MethodNotAllowed=405;
+
     public const HTTPCodeNames = [
         100 => 'Continue',
         101 => 'Switching Protocols',

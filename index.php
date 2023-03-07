@@ -9,6 +9,9 @@
 <script src="/static/js/core/jquery.min.js"></script>
 <script src="/static/js/core/jquery-ui.min.js"></script>
 <script src="/static/js/core/jquery.datetimepicker.full.min.js"></script>
+<script src="/static/js/core/crypto-js.core.min.js"></script>
+<script src="/static/js/core/crypto-js.md5.js"></script>
+<script src="/static/js/core/crypto-js.sha256.js"></script>
 <script src="/static/js/core/fox-common.js"></script>
 <script type="module" src="/static/js/core/main.js"></script>
 </head>

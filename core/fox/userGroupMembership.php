@@ -63,7 +63,7 @@ class userGroupMembership extends baseClass implements externalCallable
     {
         if (empty($this->__user) && ! empty($this->userId)) {
             try {
-                $this->__user = new user($this->userId);
+                $this->__user = new user(id: $this->userId, loadDeleted: true);
             } catch (\Exception $e) {
                 return null;
             }
@@ -138,7 +138,7 @@ class userGroupMembership extends baseClass implements externalCallable
         if (empty($pageSize) || !(is_numeric($pageSize))) {$pageSize=$request->user->config["pageSize"];}
         
         if (!empty($request->requestBody->userId)) {
-            $user = new user($userId=common::clearInput($request->requestBody->userId,"0-9"));    
+            $user = new user(id: $userId=common::clearInput($request->requestBody->userId,"0-9"), loadDeleted: true);    
         } else {
             $user=null;
             $userId=null;
@@ -165,7 +165,7 @@ class userGroupMembership extends baseClass implements externalCallable
             $rv[]=[
                 "ugmId"=>$ugm->id,
                 "user"=>($userId==$ugm->userId)?$user:$ugm->user,
-                "group"=>($groupId=$ugm->groupId)?$group:$ugm->group,
+                "group"=>($groupId==$ugm->groupId)?$group:$ugm->group,
             ];
         }
         

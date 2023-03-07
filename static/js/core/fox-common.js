@@ -3,6 +3,7 @@ import("./ui.js").then(function(mod) { UI=mod; });
 import("./api.js").then(function(mod) { API=mod; });    
 import('./langpack.js').then(function(mod) { langPack=mod.langPack; });
 
+const blanker="blanker";
 
 function base64_decode( data ) {	// Decodes data encoded with MIME base64
 	// 

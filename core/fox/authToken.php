@@ -23,6 +23,8 @@ class authToken extends baseClass
 
     protected $id;
 
+    protected $sessionId;
+
     protected $token1;
 
     protected $token2;
@@ -41,6 +43,8 @@ class authToken extends baseClass
 
     // token expiration stamp
     protected ?user $__user = null;
+
+    protected $renewed=false;
 
     /*
      * Token type - defines usage area
@@ -88,6 +92,11 @@ class authToken extends baseClass
             "index" => "INDEX",
             "nullable" => false
         ],
+        "sessionId"=>[
+            "type"=>"CHAR(51)",
+            "index"=>"UNIQUE",
+            "nullable"=>true,
+        ],
         "token1" => [
             "type" => "CHAR(64)",
             "index" => "UNIQUE",
@@ -100,6 +109,9 @@ class authToken extends baseClass
         "token2b" => [
             "type" => "CHAR(64)",
             "nullable" => true
+        ],
+        "renewed" => [
+            "type"=>"SKIP",
         ]
     ];
 
@@ -146,6 +158,8 @@ class authToken extends baseClass
             trigger_error("Token renew started");
             $t->renew();
             header("X-Fox-Token-Renew: " . $t->token);
+            header("X-Fox-Token-Expire: " . ($t->expireStamp->isNull() ? "Never" : $t->expireStamp->stamp));
+            header("X-Fox-JWT: " . authJwt::issueByAuthToken($t));
             trigger_error("Token renew completed");
             $rv= $t;
         } else if (time() < $t->expireStamp->stamp && time() > ($t->renewStamp->stamp + $renewTTL / 2) && $t->token1 == $token1 && $t->token2 != $token2 && $t->token2b == $token2) {
@@ -172,6 +186,7 @@ class authToken extends baseClass
         static::dropExpired();
         $t = new authToken();
         $t->userId = $user->id;
+        $t->sessionId=uniqid(more_entropy: true).".".bin2hex(random_bytes(8));
         $type = strtoupper($type);
         if (array_key_exists($type, static::tokenTypes)) {
             $t->type = $type;
@@ -226,6 +241,7 @@ class authToken extends baseClass
             }
         }
         $this->save();
+        $this->renewed=true;
         return $this->token;
     }
 

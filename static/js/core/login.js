@@ -135,7 +135,8 @@ function doLogin() {
 
 function loginSuccessCallback(json) {
 	localStorage.setItem("token",json.data.token);
-	localStorage.setItem("tokenExpire",json.data.expire.stamp);
+	localStorage.setItem("tokenExpire",json.data.expire);
+	localStorage.setItem("jwt",json.data.jwt);
 	lpCacheDrop();
 	UI.setLocation(sessionStorage.getItem("foxAuthReturnUrl"));
 	sessionStorage.removeItem("foxAuthReturnUrl");

@@ -29,6 +29,7 @@
 --mxs-switch-alert: rgba(255,35,0,0.8);
 
 --mxs-bg-rgba-prefix: 238, 242, 244;
+--mxs-bgalert-rgba: rgba(26, 11, 4, 0.685);
 
 
 }
@@ -116,6 +117,17 @@ body.login
  
 }
 
+i.panel.inactive {
+	color: var(--mxs-lightgray)
+}
+
+i.panel.active {
+	color: inherit
+}
+
+i.panel.highlighted {
+	color: yellow;
+}
 
 
 

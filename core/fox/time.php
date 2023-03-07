@@ -100,7 +100,10 @@ class time implements stringExportable, stringImportable, \JsonSerializable
         return $this->stamp;
     }
 
-    public static function formatInterval($val) {
+    public static function formatInterval($val, $lang="en") {
+
+        $lang=langPack::get("core.timeIntervalsShort",$lang);
+
         $durWeeks=floor($val/604800);
         $durXWeeks=$val % 604800;
         $durDays=floor($durXWeeks/86400);
@@ -110,7 +113,7 @@ class time implements stringExportable, stringImportable, \JsonSerializable
         $durMins=floor($durXHrs/60);
         $durSecs=floor($durXHrs % 60);
         
-        return ($durWeeks>0?$durWeeks."W ":"").($durDays>0?$durDays."D ":"").str_pad($durHrs,2, "0", STR_PAD_LEFT).":".str_pad($durMins,2, "0", STR_PAD_LEFT).":".str_pad($durSecs,2, "0", STR_PAD_LEFT);
+        return ($durWeeks>0?$durWeeks.$lang["weeks"]." ":"").($durDays>0?$durDays.$lang["days"]." ":"").str_pad($durHrs,2, "0", STR_PAD_LEFT).":".str_pad($durMins,2, "0", STR_PAD_LEFT).":".str_pad($durSecs,2, "0", STR_PAD_LEFT);
     }
 }
 

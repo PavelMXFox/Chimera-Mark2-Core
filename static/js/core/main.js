@@ -2,22 +2,25 @@ $("#jsNotStartedStub").remove();
 
 import { lpInit } from './langpack.js';
 import { foxMenu } from './ui.menu.js';
-
+import * as rabbitJQ from './rabbit.js';
 
 var popState_Installed=false;
+var rabbit_started=false;
 
 $(document).ready(async function() {
 	let i=0;
 	while (UI ==undefined || API ==undefined) {
 		await new Promise(r => setTimeout(r, 10));
 	}
-	
 	load();	
 });
 
 export async function load() {
-	await API.settings.load();
-	await API.session.load();
+	await API.session.check();
+	await Promise.all([
+		API.settings.load(),
+		API.session.load(),
+	]);
 	await lpInit();
 	boot();
 }
@@ -80,6 +83,12 @@ export function boot(xlite) {
 				boot(true);
 			});
 			popState_Installed=true;
+		}
+
+		if (!rabbit_started) {
+			rabbit_started=true;
+			console.log("Start rabbit?")
+			rabbitJQ.load();
 		}
 	}
 }

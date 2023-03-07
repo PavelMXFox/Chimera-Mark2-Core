@@ -18,6 +18,8 @@ use fox\request;
 use fox\modules;
 use fox\foxRequestResult;
 use fox\moduleInfo;
+use Firebase\JWT\JWT;
+use fox\config;
 
 class session implements externalCallable
 {
@@ -50,18 +52,18 @@ class session implements externalCallable
                         }
                     }
 
-                   
                     return [
+                        "sessionId"=>$request->token->sessionId,
                         "updated" => time(),
                         "user" => $request->token->user,
                         "acls" => $request->user->getAccessRules(),
-                        "modules" => $modules,
+                        "modules" => $modules
                     ];
                 }
                 throw new foxException("Unauthorized", 401);
                 break;
             default:
-                throw new foxException("Method not allowe", 405);
+                throw new foxException("Method not allowed", 405);
                 break;
         }
     }

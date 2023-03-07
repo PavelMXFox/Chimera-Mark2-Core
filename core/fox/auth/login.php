@@ -15,6 +15,7 @@ namespace fox\auth;
 use fox\externalCallable;
 use fox\foxException;
 use fox\auth;
+use fox\authJwt;
 use fox\authToken;
 use fox\request;
 use fox\foxRequestResult;
@@ -42,7 +43,8 @@ class login implements externalCallable
                     $t = authToken::issue($u, $type);
                     return [
                         "token" => $t->token,
-                        "expire" => $t->expireStamp->isNull() ? "Never" : $t->expireStamp
+                        "expire" => $t->expireStamp->isNull() ? "Never" : $t->expireStamp,
+                        "jwt"=>authJwt::issueByAuthToken($t)
                     ];
                 } else {
                     throw new foxException("Authorization failed", 401);
